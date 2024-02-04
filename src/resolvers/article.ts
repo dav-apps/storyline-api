@@ -1,6 +1,16 @@
 import { Article } from "@prisma/client"
 import { ResolverContext, List } from "../types.js"
 
+export async function retrieveArticle(
+	parent: any,
+	args: { uuid: string },
+	context: ResolverContext
+): Promise<Article> {
+	return await context.prisma.article.findFirst({
+		where: { uuid: args.uuid }
+	})
+}
+
 export async function listArticles(
 	parent: any,
 	args: {

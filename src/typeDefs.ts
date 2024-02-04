@@ -1,6 +1,10 @@
 export const typeDefs = `#graphql
 	type Query {
-		listArticles: ArticleList!
+		retrieveArticle(uuid: String!): Article
+		listArticles(
+			limit: Int
+			offset: Int
+		): ArticleList!
 	}
 
 	type Article {
