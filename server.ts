@@ -2,6 +2,7 @@ import { ApolloServer } from "@apollo/server"
 import { expressMiddleware } from "@apollo/server/express4"
 import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer"
 import { makeExecutableSchema } from "@graphql-tools/schema"
+import { ApifyClient } from "apify-client"
 import express from "express"
 import http from "http"
 import cors from "cors"
@@ -17,6 +18,10 @@ const httpServer = http.createServer(app)
 let schema = makeExecutableSchema({
 	typeDefs,
 	resolvers
+})
+
+const apifyClient = new ApifyClient({
+	token: process.env.APIFY_API_KEY
 })
 
 const server = new ApolloServer({
@@ -49,7 +54,9 @@ app.use(
 	express.json({ type: "application/json", limit: "50mb" }),
 	expressMiddleware(server, {
 		context: async ({ req }) => {
-			return {}
+			return {
+				apify: apifyClient
+			}
 		}
 	})
 )
