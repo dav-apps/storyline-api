@@ -1,5 +1,7 @@
+import * as articleResolvers from "./resolvers/article.js"
+
 export const resolvers = {
 	Query: {
-		hello: () => "Hello World"
+		listArticles: articleResolvers.listArticles
 	}
 }
