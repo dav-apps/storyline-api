@@ -29,7 +29,8 @@ export async function listArticles(
 		context.prisma.article.count(),
 		context.prisma.article.findMany({
 			take,
-			skip
+			skip,
+			orderBy: { date: "desc" }
 		})
 	])
 
