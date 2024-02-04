@@ -5,12 +5,16 @@ import { prisma, apify } from "../../server.js"
 
 export async function fetchArticles(req: Request, res: Response) {
 	try {
+		// Get all publishers
+		const publishers = await prisma.publisher.findMany()
+		const startUrls: { url: string }[] = []
+
+		for (let publisher of publishers) {
+			startUrls.push({ url: `https://${publisher.url}` })
+		}
+
 		const input = {
-			startUrls: [
-				{
-					url: "https://www.tagesschau.de/"
-				}
-			],
+			startUrls,
 			onlyNewArticles: true,
 			onlyNewArticlesPerDomain: true,
 			onlyInsideArticles: true,
