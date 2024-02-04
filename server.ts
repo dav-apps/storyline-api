@@ -9,6 +9,7 @@ import cors from "cors"
 import { Dav, Environment } from "dav-js"
 import { typeDefs } from "./src/typeDefs.js"
 import { resolvers } from "./src/resolvers.js"
+import { setup as articleSetup } from "./src/endpoints/article.js"
 import "dotenv/config"
 
 const port = process.env.PORT || 4004
@@ -47,6 +48,9 @@ new Dav({
 	environment,
 	server: true
 })
+
+// Call setup functions of each endpoint file
+articleSetup(app)
 
 app.use(
 	"/",
