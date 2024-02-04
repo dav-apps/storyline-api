@@ -6,6 +6,7 @@ import { ApifyClient } from "apify-client"
 import express from "express"
 import http from "http"
 import cors from "cors"
+import { PrismaClient } from "@prisma/client"
 import { Dav, Environment } from "dav-js"
 import { typeDefs } from "./src/typeDefs.js"
 import { resolvers } from "./src/resolvers.js"
@@ -21,7 +22,8 @@ let schema = makeExecutableSchema({
 	resolvers
 })
 
-const apifyClient = new ApifyClient({
+export const prisma = new PrismaClient()
+export const apify = new ApifyClient({
 	token: process.env.APIFY_API_KEY
 })
 
@@ -59,7 +61,8 @@ app.use(
 	expressMiddleware(server, {
 		context: async ({ req }) => {
 			return {
-				apify: apifyClient
+				prisma,
+				apify
 			}
 		}
 	})
