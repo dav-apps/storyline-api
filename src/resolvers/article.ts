@@ -1,4 +1,4 @@
-import { Article } from "@prisma/client"
+import { Publisher, Article } from "@prisma/client"
 import { ResolverContext, List } from "../types.js"
 
 export async function retrieveArticle(
@@ -38,4 +38,14 @@ export async function listArticles(
 		total,
 		items
 	}
+}
+
+export async function publisher(
+	article: Article,
+	args: any,
+	context: ResolverContext
+): Promise<Publisher> {
+	return await context.prisma.publisher.findFirst({
+		where: { id: article.publisherId }
+	})
 }

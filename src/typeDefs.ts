@@ -7,8 +7,15 @@ export const typeDefs = `#graphql
 		): ArticleList!
 	}
 
+	type Publisher {
+		uuid: String!
+		name: String!
+		url: String!
+	}
+
 	type Article {
 		uuid: String!
+		publisher: Publisher!
 		url: String!
 		title: String
 		description: String
