@@ -45,7 +45,7 @@ export async function fetchArticles(req: Request, res: Response) {
 			useBrowser: false
 		}
 
-		const run = await apify.actor(process.env.APIFY_ACTORY_ID).call(input)
+		const run = await apify.actor(process.env.APIFY_ACTOR_ID).call(input)
 		const { items } = await apify.dataset(run.defaultDatasetId).listItems()
 
 		for (let item of items) {
