@@ -39,13 +39,3 @@ export async function listArticles(
 		items
 	}
 }
-
-export async function publisher(
-	article: Article,
-	args: any,
-	context: ResolverContext
-): Promise<Publisher> {
-	return await context.prisma.publisher.findFirst({
-		where: { id: article.publisherId }
-	})
-}

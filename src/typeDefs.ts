@@ -11,18 +11,17 @@ export const typeDefs = `#graphql
 		uuid: String!
 		name: String!
 		url: String!
+		logoUrl: String!
 	}
 
 	type Article {
 		uuid: String!
-		publisher: Publisher!
 		url: String!
 		title: String
 		description: String
 		date: String
-		lang: String
-		image: String
-		text: String
+		imageUrl: String
+		content: String
 	}
 
 	type ArticleList {
