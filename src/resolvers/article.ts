@@ -39,3 +39,22 @@ export async function listArticles(
 		items
 	}
 }
+
+export async function publisher(
+	article: Article,
+	args: any,
+	context: ResolverContext
+): Promise<Publisher> {
+	const articleWithFeeds = await context.prisma.article.findFirst({
+		where: { id: article.id },
+		include: { feeds: true }
+	})
+
+	const feed = await context.prisma.feed.findFirst({
+		where: { id: articleWithFeeds.feeds[0].id }
+	})
+
+	return await context.prisma.publisher.findFirst({
+		where: { id: feed.publisherId }
+	})
+}

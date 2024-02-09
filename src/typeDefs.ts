@@ -16,6 +16,7 @@ export const typeDefs = `#graphql
 
 	type Article {
 		uuid: String!
+		publisher: Publisher!
 		url: String!
 		title: String
 		description: String

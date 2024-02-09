@@ -4,5 +4,8 @@ export const resolvers = {
 	Query: {
 		retrieveArticle: articleResolvers.retrieveArticle,
 		listArticles: articleResolvers.listArticles
+	},
+	Article: {
+		publisher: articleResolvers.publisher
 	}
 }
