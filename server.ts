@@ -2,7 +2,6 @@ import { ApolloServer } from "@apollo/server"
 import { expressMiddleware } from "@apollo/server/express4"
 import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer"
 import { makeExecutableSchema } from "@graphql-tools/schema"
-import { ApifyClient } from "apify-client"
 import express from "express"
 import http from "http"
 import cors from "cors"
@@ -10,7 +9,7 @@ import { PrismaClient } from "@prisma/client"
 import { Dav, Environment } from "dav-js"
 import { typeDefs } from "./src/typeDefs.js"
 import { resolvers } from "./src/resolvers.js"
-import { setup as articleSetup } from "./src/endpoints/article.js"
+import { fetchArticles } from "./src/utils.js"
 import "dotenv/config"
 
 const port = process.env.PORT || 4004
@@ -48,9 +47,6 @@ new Dav({
 	server: true
 })
 
-// Call setup functions of each endpoint file
-articleSetup(app)
-
 app.use(
 	"/",
 	cors<cors.CorsRequest>(),
@@ -69,4 +65,11 @@ console.log(`🚀 Server ready at http://localhost:${port}/`)
 
 BigInt.prototype["toJSON"] = function () {
 	return this.toString()
+}
+
+if (environment == Environment.Staging) {
+	while (true) {
+		await fetchArticles()
+		await new Promise(resolve => setTimeout(resolve, 1000 * 60 * 60 * 6))
+	}
 }
