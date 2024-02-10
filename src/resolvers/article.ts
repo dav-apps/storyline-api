@@ -1,4 +1,7 @@
 import { Publisher, Article } from "@prisma/client"
+import { Readability, isProbablyReaderable } from "@mozilla/readability"
+import { JSDOM } from "jsdom"
+import axios from "axios"
 import { ResolverContext, List } from "../types.js"
 
 export async function retrieveArticle(
@@ -57,4 +60,25 @@ export async function publisher(
 	return await context.prisma.publisher.findFirst({
 		where: { id: feed.publisherId }
 	})
+}
+
+export async function content(article: Article): Promise<string> {
+	let res = await axios({
+		method: "get",
+		url: article.url
+	})
+
+	const doc = new JSDOM(res.data)
+
+	if (isProbablyReaderable(doc.window.document)) {
+		let aTags = doc.window.document.querySelectorAll("a")
+
+		aTags.forEach((item: HTMLAnchorElement) => {
+			item.setAttribute("target", "blank")
+		})
+
+		return new Readability(doc.window.document).parse().content
+	} else {
+		return article.content
+	}
 }

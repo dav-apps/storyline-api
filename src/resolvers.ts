@@ -6,6 +6,7 @@ export const resolvers = {
 		listArticles: articleResolvers.listArticles
 	},
 	Article: {
-		publisher: articleResolvers.publisher
+		publisher: articleResolvers.publisher,
+		content: articleResolvers.content
 	}
 }
