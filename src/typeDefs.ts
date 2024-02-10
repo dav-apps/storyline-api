@@ -1,5 +1,6 @@
 export const typeDefs = `#graphql
 	type Query {
+		retrievePublisher(uuid: String!): Publisher
 		retrieveArticle(uuid: String!): Article
 		listArticles(
 			limit: Int
