@@ -6,6 +6,7 @@ import express from "express"
 import http from "http"
 import cors from "cors"
 import { PrismaClient } from "@prisma/client"
+import { createClient } from "redis"
 import { Dav, Environment } from "dav-js"
 import { typeDefs } from "./src/typeDefs.js"
 import { resolvers } from "./src/resolvers.js"
@@ -22,6 +23,16 @@ let schema = makeExecutableSchema({
 })
 
 export const prisma = new PrismaClient()
+
+//#region Redis config
+export const redis = createClient({
+	url: process.env.REDIS_URL,
+	database: process.env.ENVIRONMENT == "production" ? 9 : 8 // production: 9, staging: 8
+})
+
+redis.on("error", err => console.log("Redis Client Error", err))
+await redis.connect()
+//#endregion
 
 const server = new ApolloServer({
 	schema,
@@ -54,7 +65,8 @@ app.use(
 	expressMiddleware(server, {
 		context: async ({ req }) => {
 			return {
-				prisma
+				prisma,
+				redis
 			}
 		}
 	})
