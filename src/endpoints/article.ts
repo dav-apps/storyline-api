@@ -7,7 +7,7 @@ import { prisma, apify } from "../../server.js"
 
 async function fetchArticles2(req: Request, res: Response) {
 	try {
-		const parser = new Parser()
+		const parser = new Parser({ customFields: { feed: ["copyright"] } })
 		const feeds = await prisma.feed.findMany()
 
 		for (let f of feeds) {

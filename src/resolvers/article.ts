@@ -68,16 +68,17 @@ export async function content(article: Article): Promise<string> {
 		url: article.url
 	})
 
-	const doc = new JSDOM(res.data)
+	const dom = new JSDOM(res.data)
+	const document = dom.window.document
 
-	if (isProbablyReaderable(doc.window.document)) {
-		let aTags = doc.window.document.querySelectorAll("a")
+	if (isProbablyReaderable(document)) {
+		let aTags = document.querySelectorAll("a")
 
 		aTags.forEach((item: HTMLAnchorElement) => {
 			item.setAttribute("target", "blank")
 		})
 
-		return new Readability(doc.window.document).parse().content
+		return new Readability(document).parse().content
 	} else {
 		return article.content
 	}

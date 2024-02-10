@@ -13,6 +13,7 @@ model Publisher {
   name String @db.VarChar
   url String @db.VarChar
   logoUrl String @db.VarChar
+  copyright String @db.VarChar
   feeds Feed[]
 }
 
