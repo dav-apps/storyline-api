@@ -23,9 +23,6 @@ let schema = makeExecutableSchema({
 })
 
 export const prisma = new PrismaClient()
-export const apify = new ApifyClient({
-	token: process.env.APIFY_API_KEY
-})
 
 const server = new ApolloServer({
 	schema,
@@ -61,8 +58,7 @@ app.use(
 	expressMiddleware(server, {
 		context: async ({ req }) => {
 			return {
-				prisma,
-				apify
+				prisma
 			}
 		}
 	})
