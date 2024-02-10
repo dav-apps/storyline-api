@@ -14,6 +14,10 @@ export const typeDefs = `#graphql
 		url: String!
 		logoUrl: String!
 		copyright: String!
+		articles(
+			limit: Int
+			offset: Int
+		): ArticleList!
 	}
 
 	type Article {

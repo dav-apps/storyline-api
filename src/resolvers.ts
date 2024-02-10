@@ -7,6 +7,9 @@ export const resolvers = {
 		retrieveArticle: articleResolvers.retrieveArticle,
 		listArticles: articleResolvers.listArticles
 	},
+	Publisher: {
+		articles: publisherResolvers.articles
+	},
 	Article: {
 		publisher: articleResolvers.publisher,
 		content: articleResolvers.content
