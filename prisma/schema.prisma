@@ -23,7 +23,7 @@ model Feed {
   publisherId BigInt
   url String @db.VarChar
   name String @db.VarChar
-  description String @db.VarChar
+  description String? @db.VarChar
   language String @db.VarChar
   publisher Publisher @relation(fields: [publisherId], references: [id])
   articles Article[]
