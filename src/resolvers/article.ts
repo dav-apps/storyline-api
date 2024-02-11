@@ -2,16 +2,19 @@ import { Publisher, Article } from "@prisma/client"
 import { Readability, isProbablyReaderable } from "@mozilla/readability"
 import { JSDOM } from "jsdom"
 import axios from "axios"
-import { ResolverContext, List } from "../types.js"
+import { ResolverContext, QueryResult, List } from "../types.js"
 
 export async function retrieveArticle(
 	parent: any,
 	args: { uuid: string },
 	context: ResolverContext
-): Promise<Article> {
-	return await context.prisma.article.findFirst({
-		where: { uuid: args.uuid }
-	})
+): Promise<QueryResult<Article>> {
+	return {
+		caching: true,
+		data: await context.prisma.article.findFirst({
+			where: { uuid: args.uuid }
+		})
+	}
 }
 
 export async function listArticles(
@@ -21,7 +24,7 @@ export async function listArticles(
 		offset?: number
 	},
 	context: ResolverContext
-): Promise<List<Article>> {
+): Promise<QueryResult<List<Article>>> {
 	let take = args.limit ?? 10
 	if (take <= 0) take = 10
 
@@ -38,8 +41,11 @@ export async function listArticles(
 	])
 
 	return {
-		total,
-		items
+		caching: true,
+		data: {
+			total,
+			items
+		}
 	}
 }
 
@@ -47,7 +53,7 @@ export async function publisher(
 	article: Article,
 	args: any,
 	context: ResolverContext
-): Promise<Publisher> {
+): Promise<QueryResult<Publisher>> {
 	const articleWithFeeds = await context.prisma.article.findFirst({
 		where: { id: article.id },
 		include: { feeds: true }
@@ -57,12 +63,15 @@ export async function publisher(
 		where: { id: articleWithFeeds.feeds[0].id }
 	})
 
-	return await context.prisma.publisher.findFirst({
-		where: { id: feed.publisherId }
-	})
+	return {
+		caching: true,
+		data: await context.prisma.publisher.findFirst({
+			where: { id: feed.publisherId }
+		})
+	}
 }
 
-export async function content(article: Article): Promise<string> {
+export async function content(article: Article): Promise<QueryResult<string>> {
 	let res = await axios({
 		method: "get",
 		url: article.url
@@ -78,8 +87,14 @@ export async function content(article: Article): Promise<string> {
 			item.setAttribute("target", "blank")
 		})
 
-		return new Readability(document).parse().content
+		return {
+			caching: true,
+			data: new Readability(document).parse().content
+		}
 	} else {
-		return article.content
+		return {
+			caching: true,
+			data: article.content
+		}
 	}
 }

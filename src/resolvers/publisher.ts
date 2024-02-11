@@ -1,14 +1,17 @@
 import { Article, Publisher } from "@prisma/client"
-import { List, ResolverContext } from "../types.js"
+import { ResolverContext, QueryResult, List } from "../types.js"
 
 export async function retrievePublisher(
 	parent: any,
 	args: { uuid: string },
 	context: ResolverContext
-): Promise<Publisher> {
-	return await context.prisma.publisher.findFirst({
-		where: { uuid: args.uuid }
-	})
+): Promise<QueryResult<Publisher>> {
+	return {
+		caching: true,
+		data: await context.prisma.publisher.findFirst({
+			where: { uuid: args.uuid }
+		})
+	}
 }
 
 export async function articles(
@@ -18,7 +21,7 @@ export async function articles(
 		offset?: number
 	},
 	context: ResolverContext
-): Promise<List<Article>> {
+): Promise<QueryResult<List<Article>>> {
 	let take = args.limit ?? 10
 	if (take <= 0) take = 10
 
@@ -44,7 +47,10 @@ export async function articles(
 	])
 
 	return {
-		total,
-		items
+		caching: true,
+		data: {
+			total,
+			items
+		}
 	}
 }

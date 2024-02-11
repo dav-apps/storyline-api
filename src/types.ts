@@ -6,6 +6,11 @@ export interface ResolverContext {
 	redis: RedisClientType<any, any, any>
 }
 
+export interface QueryResult<T> {
+	caching: boolean
+	data: T
+}
+
 export interface List<T> {
 	total: number
 	items: T[]
