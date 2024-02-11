@@ -49,7 +49,7 @@ export async function cachingResolver(
 
 	if (result.caching) {
 		await context.redis.set(key, JSON.stringify(result.data))
-		await context.redis.expire(key, 60 * 60 * 24) // Expire after 1 day
+		await context.redis.expire(key, 60 * 60 * 3) // Expire after 3 hours
 	}
 
 	return result.data
