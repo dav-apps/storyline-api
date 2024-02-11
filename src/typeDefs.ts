@@ -11,6 +11,7 @@ export const typeDefs = `#graphql
 	type Publisher {
 		uuid: String!
 		name: String!
+		description: String!
 		url: String!
 		logoUrl: String!
 		copyright: String!

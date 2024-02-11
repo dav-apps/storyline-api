@@ -11,6 +11,7 @@ model Publisher {
   id BigInt @id @default(autoincrement())
   uuid String @unique @db.VarChar @default(uuid())
   name String @db.VarChar
+  description String @db.VarChar
   url String @db.VarChar
   logoUrl String @db.VarChar
   copyright String @db.VarChar
