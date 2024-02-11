@@ -1,17 +1,75 @@
+import { ResolverContext } from "./types.js"
+import { cachingResolver } from "./services/cachingService.js"
 import * as publisherResolvers from "./resolvers/publisher.js"
 import * as articleResolvers from "./resolvers/article.js"
 
 export const resolvers = {
 	Query: {
-		retrievePublisher: publisherResolvers.retrievePublisher,
-		retrieveArticle: articleResolvers.retrieveArticle,
-		listArticles: articleResolvers.listArticles
+		retrievePublisher: (
+			parent: any,
+			args: any,
+			context: ResolverContext,
+			info: any
+		) =>
+			cachingResolver(
+				parent,
+				args,
+				context,
+				info,
+				publisherResolvers.retrievePublisher
+			),
+		retrieveArticle: (
+			parent: any,
+			args: any,
+			context: ResolverContext,
+			info: any
+		) =>
+			cachingResolver(
+				parent,
+				args,
+				context,
+				info,
+				articleResolvers.retrieveArticle
+			),
+		listArticles: (
+			parent: any,
+			args: any,
+			context: ResolverContext,
+			info: any
+		) =>
+			cachingResolver(
+				parent,
+				args,
+				context,
+				info,
+				articleResolvers.listArticles
+			)
 	},
 	Publisher: {
-		articles: publisherResolvers.articles
+		articles: (parent: any, args: any, context: ResolverContext, info: any) =>
+			cachingResolver(
+				parent,
+				args,
+				context,
+				info,
+				publisherResolvers.articles
+			)
 	},
 	Article: {
-		publisher: articleResolvers.publisher,
-		content: articleResolvers.content
+		publisher: (
+			parent: any,
+			args: any,
+			context: ResolverContext,
+			info: any
+		) =>
+			cachingResolver(
+				parent,
+				args,
+				context,
+				info,
+				articleResolvers.publisher
+			),
+		content: (parent: any, args: any, context: ResolverContext, info: any) =>
+			cachingResolver(parent, args, context, info, articleResolvers.content)
 	}
 }
