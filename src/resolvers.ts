@@ -18,6 +18,19 @@ export const resolvers = {
 				info,
 				publisherResolvers.retrievePublisher
 			),
+		listPublishers: (
+			parent: any,
+			args: any,
+			context: ResolverContext,
+			info: any
+		) =>
+			cachingResolver(
+				parent,
+				args,
+				context,
+				info,
+				publisherResolvers.listPublishers
+			),
 		retrieveArticle: (
 			parent: any,
 			args: any,

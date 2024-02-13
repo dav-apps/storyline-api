@@ -1,6 +1,10 @@
 export const typeDefs = `#graphql
 	type Query {
 		retrievePublisher(uuid: String!): Publisher
+		listPublishers(
+			limit: Int
+			offset: Int
+		): PublisherList!
 		retrieveArticle(uuid: String!): Article
 		listArticles(
 			limit: Int
@@ -19,6 +23,11 @@ export const typeDefs = `#graphql
 			limit: Int
 			offset: Int
 		): ArticleList!
+	}
+
+	type PublisherList {
+		total: Int!
+		items: [Publisher!]!
 	}
 
 	type Article {
