@@ -20,6 +20,7 @@ export async function retrieveArticle(
 export async function listArticles(
 	parent: any,
 	args: {
+		publishers?: string[]
 		limit?: number
 		offset?: number
 	},
@@ -31,9 +32,32 @@ export async function listArticles(
 	let skip = args.offset ?? 0
 	if (skip < 0) skip = 0
 
+	let publisherIds: bigint[] = []
+
+	if (args.publishers != null) {
+		for (let uuid of args.publishers) {
+			let publisher = await context.prisma.publisher.findFirst({
+				where: { uuid }
+			})
+
+			if (publisher != null) {
+				publisherIds.push(publisher.id)
+			}
+		}
+	}
+
+	let where: any = {}
+
+	if (publisherIds.length > 0) {
+		where = {
+			feeds: { some: { publisher: { id: { in: publisherIds } } } }
+		}
+	}
+
 	const [total, items] = await context.prisma.$transaction([
-		context.prisma.article.count(),
+		context.prisma.article.count({ where }),
 		context.prisma.article.findMany({
+			where,
 			take,
 			skip,
 			orderBy: { date: "desc" }
