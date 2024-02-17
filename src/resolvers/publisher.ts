@@ -1,5 +1,6 @@
 import { Article, Publisher } from "@prisma/client"
 import { ResolverContext, QueryResult, List } from "../types.js"
+import { randomNumber } from "../utils.js"
 
 export async function retrievePublisher(
 	parent: any,
@@ -17,6 +18,7 @@ export async function retrievePublisher(
 export async function listPublishers(
 	parent: any,
 	args: {
+		random?: boolean
 		limit?: number
 		offset?: number
 	},
@@ -28,19 +30,49 @@ export async function listPublishers(
 	let skip = args.offset ?? 0
 	if (skip < 0) skip = 0
 
-	const [total, items] = await context.prisma.$transaction([
-		context.prisma.publisher.count(),
-		context.prisma.publisher.findMany({
-			take,
-			skip
-		})
-	])
+	const random = args.random || false
 
-	return {
-		caching: true,
-		data: {
-			total,
-			items
+	if (random) {
+		let total = await context.prisma.publisher.count()
+		if (take > total) take = total
+
+		let indices = []
+		let items = []
+
+		while (indices.length < take) {
+			let i = randomNumber(0, total - 1)
+
+			if (!indices.includes(i)) {
+				indices.push(i)
+			}
+		}
+
+		for (let i of indices) {
+			items.push(await context.prisma.publisher.findFirst({ skip: i }))
+		}
+
+		return {
+			caching: true,
+			data: {
+				total,
+				items
+			}
+		}
+	} else {
+		const [total, items] = await context.prisma.$transaction([
+			context.prisma.publisher.count(),
+			context.prisma.publisher.findMany({
+				take,
+				skip
+			})
+		])
+
+		return {
+			caching: true,
+			data: {
+				total,
+				items
+			}
 		}
 	}
 }

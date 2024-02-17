@@ -2,6 +2,7 @@ export const typeDefs = `#graphql
 	type Query {
 		retrievePublisher(uuid: String!): Publisher
 		listPublishers(
+			random: Boolean
 			limit: Int
 			offset: Int
 		): PublisherList!
