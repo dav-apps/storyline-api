@@ -6,6 +6,7 @@ import express from "express"
 import http from "http"
 import cors from "cors"
 import { PrismaClient } from "@prisma/client"
+import OpenAI from "openai"
 import { createClient } from "redis"
 import { Dav, Environment } from "dav-js"
 import { typeDefs } from "./src/typeDefs.js"
@@ -23,6 +24,10 @@ let schema = makeExecutableSchema({
 })
 
 export const prisma = new PrismaClient()
+
+const openai = new OpenAI({
+	apiKey: process.env.OPENAI_SECRET_KEY
+})
 
 //#region Redis config
 export const redis = createClient({
@@ -66,6 +71,7 @@ app.use(
 		context: async ({ req }) => {
 			return {
 				prisma,
+				openai,
 				redis
 			}
 		}

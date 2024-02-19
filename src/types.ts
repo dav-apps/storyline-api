@@ -1,8 +1,10 @@
 import { PrismaClient } from "@prisma/client"
+import OpenAI from "openai"
 import { RedisClientType } from "redis"
 
 export interface ResolverContext {
 	prisma: PrismaClient
+	openai: OpenAI
 	redis: RedisClientType<any, any, any>
 }
 
