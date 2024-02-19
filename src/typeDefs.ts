@@ -40,6 +40,7 @@ export const typeDefs = `#graphql
 		date: String
 		imageUrl: String
 		content: String
+		summary: String
 	}
 
 	type ArticleList {

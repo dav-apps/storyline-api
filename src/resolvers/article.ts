@@ -95,11 +95,19 @@ export async function publisher(
 	}
 }
 
-export async function content(
+export async function summary(
 	article: Article,
 	args: any,
 	context: ResolverContext
 ): Promise<QueryResult<string>> {
+	// Check if the article already has a summary
+	if (article.summary != null) {
+		return {
+			caching: true,
+			data: article.summary
+		}
+	}
+
 	let res = await axios({
 		method: "get",
 		url: article.url
@@ -121,9 +129,17 @@ export async function content(
 			model: "gpt-3.5-turbo"
 		})
 
+		const summary = completion.choices[0].message.content
+
+		// Save the summary in the article
+		await context.prisma.article.update({
+			where: { uuid: article.uuid },
+			data: { summary }
+		})
+
 		return {
 			caching: true,
-			data: completion.choices[0].message.content
+			data: summary
 		}
 	} else {
 		return {
