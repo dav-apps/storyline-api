@@ -95,7 +95,11 @@ export async function publisher(
 	}
 }
 
-export async function content(article: Article): Promise<QueryResult<string>> {
+export async function content(
+	article: Article,
+	args: any,
+	context: ResolverContext
+): Promise<QueryResult<string>> {
 	let res = await axios({
 		method: "get",
 		url: article.url
@@ -105,15 +109,21 @@ export async function content(article: Article): Promise<QueryResult<string>> {
 	const document = dom.window.document
 
 	if (isProbablyReaderable(document)) {
-		let aTags = document.querySelectorAll("a")
+		let textContent = new Readability(document).parse().textContent
 
-		aTags.forEach((item: HTMLAnchorElement) => {
-			item.setAttribute("target", "blank")
+		const completion = await context.openai.chat.completions.create({
+			messages: [
+				{
+					role: "user",
+					content: `Summarize the following article. Please use HTML for headers and breaks.\n\n${textContent}`
+				}
+			],
+			model: "gpt-3.5-turbo"
 		})
 
 		return {
 			caching: true,
-			data: new Readability(document).parse().content
+			data: completion.choices[0].message.content
 		}
 	} else {
 		return {
