@@ -59,6 +59,8 @@ export const resolvers = {
 			)
 	},
 	Publisher: {
+		feeds: (parent: any, args: any, context: ResolverContext, info: any) =>
+			cachingResolver(parent, args, context, info, publisherResolvers.feeds),
 		articles: (parent: any, args: any, context: ResolverContext, info: any) =>
 			cachingResolver(
 				parent,

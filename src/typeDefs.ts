@@ -20,6 +20,10 @@ export const typeDefs = `#graphql
 		description: String!
 		url: String!
 		logoUrl: String!
+		feeds(
+			limit: Int
+			offset: Int
+		): FeedList!
 		articles(
 			limit: Int
 			offset: Int
@@ -29,6 +33,19 @@ export const typeDefs = `#graphql
 	type PublisherList {
 		total: Int!
 		items: [Publisher!]!
+	}
+
+	type Feed {
+		uuid: String!
+		url: String!
+		name: String!
+		description: String
+		language: String
+	}
+
+	type FeedList {
+		total: Int!
+		items: [Feed!]!
 	}
 
 	type Article {

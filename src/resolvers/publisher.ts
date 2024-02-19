@@ -1,4 +1,4 @@
-import { Article, Publisher } from "@prisma/client"
+import { Publisher, Feed, Article } from "@prisma/client"
 import { ResolverContext, QueryResult, List } from "../types.js"
 import { randomNumber } from "../utils.js"
 
@@ -73,6 +73,40 @@ export async function listPublishers(
 				total,
 				items
 			}
+		}
+	}
+}
+
+export async function feeds(
+	publisher: Publisher,
+	args: {
+		limit?: number
+		offset?: number
+	},
+	context: ResolverContext
+): Promise<QueryResult<List<Feed>>> {
+	let take = args.limit ?? 10
+	if (take <= 0) take = 10
+
+	let skip = args.offset ?? 0
+	if (skip < 0) skip = 0
+
+	let where = { publisherId: publisher.id }
+
+	const [total, items] = await context.prisma.$transaction([
+		context.prisma.feed.count({ where }),
+		context.prisma.feed.findMany({
+			take,
+			skip,
+			where
+		})
+	])
+
+	return {
+		caching: true,
+		data: {
+			total,
+			items
 		}
 	}
 }
