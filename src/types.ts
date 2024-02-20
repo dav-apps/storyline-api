@@ -1,11 +1,13 @@
 import { PrismaClient } from "@prisma/client"
-import OpenAI from "openai"
 import { RedisClientType } from "redis"
+import OpenAI from "openai"
 
 export interface ResolverContext {
 	prisma: PrismaClient
-	openai: OpenAI
 	redis: RedisClientType<any, any, any>
+	openai: OpenAI
+	accessToken?: string
+	user?: User
 }
 
 export interface QueryResult<T> {
@@ -23,3 +25,25 @@ export interface ApiError {
 	message: string
 	status?: number
 }
+
+export interface UserApiResponse {
+	status: number
+	data?: User
+	errors?: { code: number; message: string }[]
+}
+
+//#region Platform models
+export interface User {
+	id: number
+	email: string
+	firstName: string
+	confirmed: boolean
+	totalStorage: number
+	usedStorage: number
+	plan: number
+	dev: boolean
+	provider: boolean
+	profileImage: string
+	profileImageEtag: string
+}
+//#endregion

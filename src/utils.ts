@@ -1,9 +1,21 @@
 import { Response } from "express"
+import { GraphQLError } from "graphql"
 import Parser from "rss-parser"
 import urlMetadata from "url-metadata"
 import { ApiError } from "./types.js"
 import { apiErrors } from "./errors.js"
 import { prisma } from "../server.js"
+
+export function throwApiError(error: ApiError) {
+	throw new GraphQLError(error.message, {
+		extensions: {
+			code: error.code,
+			http: {
+				status: 200
+			}
+		}
+	})
+}
 
 export function throwEndpointError(error?: ApiError) {
 	if (error == null) return

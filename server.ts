@@ -8,10 +8,13 @@ import cors from "cors"
 import { PrismaClient } from "@prisma/client"
 import OpenAI from "openai"
 import { createClient } from "redis"
-import { Dav, Environment } from "dav-js"
+import { Dav, Environment, isSuccessStatusCode } from "dav-js"
+import { getUser } from "./src/services/apiService.js"
 import { typeDefs } from "./src/typeDefs.js"
 import { resolvers } from "./src/resolvers.js"
-import { fetchArticles } from "./src/utils.js"
+import { User } from "./src/types.js"
+import { throwApiError, fetchArticles } from "./src/utils.js"
+import { apiErrors } from "./src/errors.js"
 import "dotenv/config"
 
 const port = process.env.PORT || 4004
@@ -69,10 +72,29 @@ app.use(
 	express.json({ type: "application/json", limit: "50mb" }),
 	expressMiddleware(server, {
 		context: async ({ req }) => {
+			const accessToken = req.headers.authorization
+			let user: User = null
+
+			if (accessToken != null) {
+				let userResponse = await getUser(accessToken)
+
+				if (isSuccessStatusCode(userResponse.status)) {
+					user = userResponse.data
+				} else if (
+					userResponse.errors != null &&
+					userResponse.errors.length > 0 &&
+					userResponse.errors[0].code == 3101
+				) {
+					throwApiError(apiErrors.sessionEnded)
+				}
+			}
+
 			return {
 				prisma,
+				redis,
 				openai,
-				redis
+				accessToken,
+				user
 			}
 		}
 	})
