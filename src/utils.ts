@@ -49,18 +49,22 @@ export async function fetchArticles() {
 				// Get the metadata, to get the image url
 				const metadata = await urlMetadata(feedItem.link)
 
-				await prisma.article.create({
-					data: {
-						uuid: feedItem.guid,
-						feeds: { connect: { id: f.id } },
-						url: feedItem.link,
-						title: feedItem.title,
-						description: feedItem.contentSnippet,
-						date: new Date(feedItem.pubDate),
-						imageUrl: metadata["og:image"],
-						content: feedItem.content
-					}
-				})
+				try {
+					await prisma.article.create({
+						data: {
+							uuid: feedItem.guid,
+							feeds: { connect: { id: f.id } },
+							url: feedItem.link,
+							title: feedItem.title,
+							description: feedItem.contentSnippet,
+							date: new Date(feedItem.pubDate),
+							imageUrl: metadata["og:image"],
+							content: feedItem.content
+						}
+					})
+				} catch (error) {
+					console.error(error)
+				}
 			} else {
 				// Check if the article already belongs to the feed
 				let i = article.feeds.findIndex(item => item.id == f.id)
