@@ -34,7 +34,7 @@ model Article {
   uuid String @unique @db.VarChar @default(uuid())
   url String @db.VarChar @unique
   title String @db.VarChar
-  description String @db.VarChar
+  description String? @db.VarChar
   date DateTime
   imageUrl String @db.VarChar
   content String @db.Text
