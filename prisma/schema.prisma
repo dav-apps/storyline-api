@@ -37,7 +37,7 @@ model Article {
   description String? @db.VarChar
   date DateTime
   imageUrl String @db.VarChar
-  content String @db.Text
+  content String? @db.Text
   summary String? @db.Text
   feeds Feed[]
 }
