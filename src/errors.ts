@@ -29,3 +29,12 @@ export const apiErrors = {
 		status: 403
 	}
 }
+
+export const validationErrors = {
+	nameTooShort: "NAME_TOO_SHORT",
+	descriptionTooShort: "DESCRIPTION_TOO_SHORT",
+	nameTooLong: "NAME_TOO_LONG",
+	descriptionTooLong: "DESCRIPTION_TOO_LONG",
+	urlInvalid: "URL_INVALID",
+	logoUrlInvalid: "LOGO_URL_INVALID"
+}

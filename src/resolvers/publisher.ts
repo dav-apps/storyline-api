@@ -1,6 +1,59 @@
 import { Publisher, Feed, Article } from "@prisma/client"
 import { ResolverContext, QueryResult, List } from "../types.js"
-import { randomNumber } from "../utils.js"
+import { randomNumber, throwApiError, throwValidationError } from "../utils.js"
+import { apiErrors } from "../errors.js"
+import { admins } from "../constants.js"
+import {
+	validateDescriptionLength,
+	validateNameLength,
+	validateUrl,
+	validateLogoUrl
+} from "../services/validationService.js"
+
+export async function createPublisher(
+	parent: any,
+	args: {
+		name: string
+		description?: string
+		url: string
+		logoUrl: string
+	},
+	context: ResolverContext
+): Promise<Publisher> {
+	const user = context.user
+
+	// Check if the user is logged in
+	if (user == null) {
+		throwApiError(apiErrors.notAuthenticated)
+	}
+
+	// Check if the user is an admin
+	if (!admins.includes(user.id)) {
+		throwApiError(apiErrors.actionNotAllowed)
+	}
+
+	// Validate the args
+	let validations = [validateNameLength(args.name)]
+
+	if (args.description != null) {
+		validations.push(validateDescriptionLength(args.description))
+	}
+
+	validations.push(validateUrl(args.url))
+	validations.push(validateLogoUrl(args.logoUrl))
+
+	throwValidationError(...validations)
+
+	// Create the publisher
+	return await context.prisma.publisher.create({
+		data: {
+			name: args.name,
+			description: args.description,
+			url: args.url,
+			logoUrl: args.logoUrl
+		}
+	})
+}
 
 export async function retrievePublisher(
 	parent: any,

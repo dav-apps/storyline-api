@@ -58,6 +58,9 @@ export const resolvers = {
 				articleResolvers.listArticles
 			)
 	},
+	Mutation: {
+		createPublisher: publisherResolvers.createPublisher
+	},
 	Publisher: {
 		feeds: (parent: any, args: any, context: ResolverContext, info: any) =>
 			cachingResolver(parent, args, context, info, publisherResolvers.feeds),

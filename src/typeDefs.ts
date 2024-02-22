@@ -14,6 +14,15 @@ export const typeDefs = `#graphql
 		): ArticleList!
 	}
 
+	type Mutation {
+		createPublisher(
+			name: String!
+			description: String!
+			url: String!
+			logoUrl: String!
+		): Publisher!
+	}
+
 	type Publisher {
 		uuid: String!
 		name: String!

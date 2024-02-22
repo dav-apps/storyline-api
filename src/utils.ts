@@ -17,6 +17,19 @@ export function throwApiError(error: ApiError) {
 	})
 }
 
+export function throwValidationError(...errors: string[]) {
+	let filteredErrors = errors.filter(e => e != null)
+
+	if (filteredErrors.length > 0) {
+		throw new GraphQLError(apiErrors.validationFailed.message, {
+			extensions: {
+				code: apiErrors.validationFailed.code,
+				errors: filteredErrors
+			}
+		})
+	}
+}
+
 export function throwEndpointError(error?: ApiError) {
 	if (error == null) return
 
