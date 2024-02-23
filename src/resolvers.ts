@@ -61,6 +61,7 @@ export const resolvers = {
 	},
 	Mutation: {
 		createPublisher: publisherResolvers.createPublisher,
+		updatePublisher: publisherResolvers.updatePublisher,
 		createFeed: feedResolvers.createFeed
 	},
 	Publisher: {

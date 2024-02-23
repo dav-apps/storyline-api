@@ -14,7 +14,7 @@ export async function createPublisher(
 	parent: any,
 	args: {
 		name: string
-		description?: string
+		description: string
 		url: string
 		logoUrl: string
 	},
@@ -52,6 +52,71 @@ export async function createPublisher(
 			url: args.url,
 			logoUrl: args.logoUrl
 		}
+	})
+}
+
+export async function updatePublisher(
+	parent: any,
+	args: {
+		uuid: string
+		name?: string
+		description?: string
+		url?: string
+		logoUrl?: string
+	},
+	context: ResolverContext
+): Promise<Publisher> {
+	const user = context.user
+
+	// Check if the user is logged in
+	if (user == null) {
+		throwApiError(apiErrors.notAuthenticated)
+	}
+
+	// Check if the user is an admin
+	if (!admins.includes(user.id)) {
+		throwApiError(apiErrors.actionNotAllowed)
+	}
+
+	// Try to find the publisher
+	let publisher = await context.prisma.publisher.findFirst({
+		where: { uuid: args.uuid }
+	})
+
+	if (publisher == null) {
+		throwApiError(apiErrors.publisherDoesNotExist)
+	}
+
+	// Validate the args
+	let validations = []
+	let data: any = {}
+
+	if (args.name != null) {
+		validations.push(validateNameLength(args.name))
+		data.name = args.name
+	}
+
+	if (args.description != null) {
+		validations.push(validateDescriptionLength(args.description))
+		data.description = args.description
+	}
+
+	if (args.url != null) {
+		validations.push(validateUrl(args.url))
+		data.url = args.url
+	}
+
+	if (args.logoUrl != null) {
+		validations.push(validateLogoUrl(args.logoUrl))
+		data.logoUrl = args.logoUrl
+	}
+
+	throwValidationError(...validations)
+
+	// Update the publisher
+	return await context.prisma.publisher.update({
+		where: { id: publisher.id },
+		data
 	})
 }
 
