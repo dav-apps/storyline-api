@@ -29,4 +29,14 @@ export function validateLogoUrl(logoUrl: string) {
 		return validationErrors.logoUrlInvalid
 	}
 }
+
+export function validateLanguage(language: string) {
+	if (
+		!["en", "en-us", "en-gb", "de", "de-de", "de-at", "de-ch"].includes(
+			language
+		)
+	) {
+		return validationErrors.languageInvalid
+	}
+}
 //#endregion

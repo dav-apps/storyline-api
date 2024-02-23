@@ -27,6 +27,11 @@ export const apiErrors = {
 		code: "SESSION_ENDED",
 		message: "Session has ended and must be renewed",
 		status: 403
+	},
+	publisherDoesNotExist: {
+		code: "PUBLISHER_DOES_NOT_EXIST",
+		message: "Publisher does not exist",
+		status: 404
 	}
 }
 
@@ -36,5 +41,6 @@ export const validationErrors = {
 	nameTooLong: "NAME_TOO_LONG",
 	descriptionTooLong: "DESCRIPTION_TOO_LONG",
 	urlInvalid: "URL_INVALID",
-	logoUrlInvalid: "LOGO_URL_INVALID"
+	logoUrlInvalid: "LOGO_URL_INVALID",
+	languageInvalid: "LANGUAGE_INVALID"
 }

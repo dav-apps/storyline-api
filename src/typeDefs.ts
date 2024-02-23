@@ -21,6 +21,10 @@ export const typeDefs = `#graphql
 			url: String!
 			logoUrl: String!
 		): Publisher!
+		createFeed(
+			publisherUuid: String!
+			url: String!
+		): Feed!
 	}
 
 	type Publisher {

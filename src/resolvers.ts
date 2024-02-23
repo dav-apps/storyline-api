@@ -1,6 +1,7 @@
 import { ResolverContext } from "./types.js"
 import { cachingResolver } from "./services/cachingService.js"
 import * as publisherResolvers from "./resolvers/publisher.js"
+import * as feedResolvers from "./resolvers/feed.js"
 import * as articleResolvers from "./resolvers/article.js"
 
 export const resolvers = {
@@ -59,7 +60,8 @@ export const resolvers = {
 			)
 	},
 	Mutation: {
-		createPublisher: publisherResolvers.createPublisher
+		createPublisher: publisherResolvers.createPublisher,
+		createFeed: feedResolvers.createFeed
 	},
 	Publisher: {
 		feeds: (parent: any, args: any, context: ResolverContext, info: any) =>

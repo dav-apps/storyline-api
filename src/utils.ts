@@ -55,7 +55,7 @@ function sendEndpointError(res: Response, error: ApiError) {
 }
 
 export async function fetchArticles() {
-	const parser = new Parser({ customFields: { feed: ["copyright"] } })
+	const parser = new Parser()
 	const feeds = await prisma.feed.findMany()
 
 	for (let f of feeds) {
