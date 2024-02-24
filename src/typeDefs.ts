@@ -59,7 +59,7 @@ export const typeDefs = `#graphql
 	type Feed {
 		uuid: String!
 		url: String!
-		name: String!
+		name: String
 		description: String
 		language: String
 		articles(
