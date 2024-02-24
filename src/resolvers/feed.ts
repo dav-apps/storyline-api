@@ -88,6 +88,7 @@ export async function retrieveFeed(
 export async function articles(
 	feed: Feed,
 	args: {
+		exclude?: string
 		limit?: number
 		offset?: number
 	},
@@ -99,7 +100,11 @@ export async function articles(
 	let skip = args.offset ?? 0
 	if (skip < 0) skip = 0
 
-	let where = { feeds: { some: { id: feed.id } } }
+	let where: any = { feeds: { some: { id: feed.id } } }
+
+	if (args.exclude != null) {
+		where.NOT = { uuid: args.exclude }
+	}
 
 	const [total, items] = await context.prisma.$transaction([
 		context.prisma.article.count({ where }),

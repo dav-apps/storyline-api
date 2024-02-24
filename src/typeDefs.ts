@@ -63,6 +63,7 @@ export const typeDefs = `#graphql
 		description: String
 		language: String
 		articles(
+			exclude: String
 			limit: Int
 			offset: Int
 		): ArticleList!
