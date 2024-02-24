@@ -1,4 +1,4 @@
-import { Publisher, Article } from "@prisma/client"
+import { Publisher, Feed, Article } from "@prisma/client"
 import { Readability, isProbablyReaderable } from "@mozilla/readability"
 import { JSDOM } from "jsdom"
 import axios from "axios"
@@ -161,6 +161,34 @@ export async function summary(
 		return {
 			caching: true,
 			data: article.content
+		}
+	}
+}
+
+export async function feeds(
+	article: Article,
+	args: {
+		limit?: number
+		offset?: number
+	},
+	context: ResolverContext
+): Promise<QueryResult<List<Feed>>> {
+	let take = args.limit ?? 10
+	if (take <= 0) take = 10
+
+	let skip = args.offset ?? 0
+	if (skip < 0) skip = 0
+
+	let a = await context.prisma.article.findFirst({
+		where: { id: article.id },
+		include: { feeds: { take, skip } }
+	})
+
+	return {
+		caching: true,
+		data: {
+			total: a.feeds.length,
+			items: a.feeds
 		}
 	}
 }

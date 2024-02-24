@@ -83,6 +83,10 @@ export const typeDefs = `#graphql
 		imageUrl: String
 		content: String
 		summary: String
+		feeds(
+			limit: Int
+			offset: Int
+		): FeedList!
 	}
 
 	type ArticleList {

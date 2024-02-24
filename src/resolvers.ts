@@ -108,6 +108,8 @@ export const resolvers = {
 				articleResolvers.publisher
 			),
 		summary: (parent: any, args: any, context: ResolverContext, info: any) =>
-			cachingResolver(parent, args, context, info, articleResolvers.summary)
+			cachingResolver(parent, args, context, info, articleResolvers.summary),
+		feeds: (parent: any, args: any, context: ResolverContext, info: any) =>
+			cachingResolver(parent, args, context, info, articleResolvers.feeds)
 	}
 }
