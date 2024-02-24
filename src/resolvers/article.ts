@@ -119,11 +119,27 @@ export async function summary(
 	if (isProbablyReaderable(document)) {
 		let textContent = new Readability(document).parse().textContent
 
+		// Get the article language
+		let a = await context.prisma.article.findFirst({
+			where: { id: article.id },
+			include: { feeds: true }
+		})
+
+		const language = a.feeds[0].language
+
+		let prompt =
+			"Summarize the following text. Use HTML for headers and breaks."
+
+		if (language.startsWith("de")) {
+			prompt =
+				"Fasse den folgenden Text zuammen. Verwende HTML für Überschriften und Umbrüche."
+		}
+
 		const completion = await context.openai.chat.completions.create({
 			messages: [
 				{
 					role: "user",
-					content: `Summarize the following article. Please use HTML for headers and breaks.\n\n${textContent}`
+					content: `${prompt}\n\n${textContent}`
 				}
 			],
 			model: "gpt-3.5-turbo"
