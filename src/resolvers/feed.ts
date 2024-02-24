@@ -1,6 +1,6 @@
 import { Feed } from "@prisma/client"
 import Parser from "rss-parser"
-import { ResolverContext } from "../types.js"
+import { QueryResult, ResolverContext } from "../types.js"
 import { throwApiError, throwValidationError } from "../utils.js"
 import { apiErrors } from "../errors.js"
 import { admins } from "../constants.js"
@@ -68,4 +68,19 @@ export async function createFeed(
 			language
 		}
 	})
+}
+
+export async function retrieveFeed(
+	parent: any,
+	args: {
+		uuid: string
+	},
+	context: ResolverContext
+): Promise<QueryResult<Feed>> {
+	return {
+		caching: true,
+		data: await context.prisma.feed.findFirst({
+			where: { uuid: args.uuid }
+		})
+	}
 }

@@ -6,6 +6,7 @@ export const typeDefs = `#graphql
 			limit: Int
 			offset: Int
 		): PublisherList!
+		retrieveFeed(uuid: String!): Feed
 		retrieveArticle(uuid: String!): Article
 		listArticles(
 			publishers: [String!]
