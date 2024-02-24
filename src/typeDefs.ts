@@ -62,6 +62,10 @@ export const typeDefs = `#graphql
 		name: String!
 		description: String
 		language: String
+		articles(
+			limit: Int
+			offset: Int
+		): ArticleList!
 	}
 
 	type FeedList {

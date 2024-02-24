@@ -1,6 +1,6 @@
-import { Feed } from "@prisma/client"
+import { Feed, Article } from "@prisma/client"
 import Parser from "rss-parser"
-import { QueryResult, ResolverContext } from "../types.js"
+import { ResolverContext, QueryResult, List } from "../types.js"
 import { throwApiError, throwValidationError } from "../utils.js"
 import { apiErrors } from "../errors.js"
 import { admins } from "../constants.js"
@@ -82,5 +82,40 @@ export async function retrieveFeed(
 		data: await context.prisma.feed.findFirst({
 			where: { uuid: args.uuid }
 		})
+	}
+}
+
+export async function articles(
+	feed: Feed,
+	args: {
+		limit?: number
+		offset?: number
+	},
+	context: ResolverContext
+): Promise<QueryResult<List<Article>>> {
+	let take = args.limit ?? 10
+	if (take <= 0) take = 10
+
+	let skip = args.offset ?? 0
+	if (skip < 0) skip = 0
+
+	let where = { feeds: { some: { id: feed.id } } }
+
+	const [total, items] = await context.prisma.$transaction([
+		context.prisma.article.count({ where }),
+		context.prisma.article.findMany({
+			take,
+			skip,
+			where,
+			orderBy: { date: "desc" }
+		})
+	])
+
+	return {
+		caching: true,
+		data: {
+			total,
+			items
+		}
 	}
 }
