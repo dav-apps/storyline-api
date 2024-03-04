@@ -73,6 +73,7 @@ export async function fetchArticles() {
 			if (article == null) {
 				// Get the metadata, to get the image url
 				const metadata = await urlMetadata(feedItem.link)
+				const imageUrl = metadata["og:image"]
 
 				try {
 					await prisma.article.create({
@@ -83,7 +84,7 @@ export async function fetchArticles() {
 							title: feedItem.title,
 							description: feedItem.contentSnippet,
 							date: new Date(feedItem.pubDate),
-							imageUrl: metadata["og:image"],
+							imageUrl: imageUrl ? imageUrl : null,
 							content: feedItem.content
 						}
 					})
