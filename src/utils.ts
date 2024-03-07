@@ -2,6 +2,7 @@ import { Response } from "express"
 import { GraphQLError } from "graphql"
 import Parser from "rss-parser"
 import urlMetadata from "url-metadata"
+import * as crypto from "crypto"
 import { ApiError } from "./types.js"
 import { apiErrors } from "./errors.js"
 import { prisma } from "../server.js"
@@ -71,6 +72,9 @@ export async function fetchArticles() {
 			})
 
 			if (article == null) {
+				const uuid = crypto.randomUUID()
+				const title = feedItem.title
+
 				// Get the metadata, to get the image url
 				const metadata = await urlMetadata(feedItem.link)
 				const imageUrl = metadata["og:image"]
@@ -78,14 +82,15 @@ export async function fetchArticles() {
 				try {
 					await prisma.article.create({
 						data: {
-							uuid: feedItem.guid,
+							uuid,
 							feeds: { connect: { id: f.id } },
+							slug: `${stringToSlug(title)}-${uuid}`,
 							url: feedItem.link,
 							title: feedItem.title,
 							description: feedItem.contentSnippet,
 							date: new Date(feedItem.pubDate),
 							imageUrl: imageUrl ? imageUrl : null,
-							content: feedItem.content
+							content: feedItem.content?.trim()
 						}
 					})
 				} catch (error) {
@@ -109,4 +114,23 @@ export async function fetchArticles() {
 
 export function randomNumber(min: number, max: number) {
 	return Math.floor(Math.random() * (max - min + 1)) + min
+}
+
+export function stringToSlug(str: string): string {
+	str = str.replace(/^\s+|\s+$/g, "") // trim
+	str = str.toLowerCase()
+
+	// remove accents, swap ñ for n, etc
+	var from = "àáäâèéëêìíïîòóöôùúüûñç·/_,:;"
+	var to = "aaaaeeeeiiiioooouuuunc------"
+	for (var i = 0, l = from.length; i < l; i++) {
+		str = str.replace(new RegExp(from.charAt(i), "g"), to.charAt(i))
+	}
+
+	str = str
+		.replace(/[^a-z0-9 -]/g, "") // remove invalid chars
+		.replace(/\s+/g, "-") // collapse whitespace and replace by -
+		.replace(/-+/g, "-") // collapse dashes
+
+	return str
 }

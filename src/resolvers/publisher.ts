@@ -1,11 +1,16 @@
 import { Publisher, Feed, Article } from "@prisma/client"
 import { ResolverContext, QueryResult, List } from "../types.js"
-import { randomNumber, throwApiError, throwValidationError } from "../utils.js"
+import {
+	throwApiError,
+	throwValidationError,
+	randomNumber,
+	stringToSlug
+} from "../utils.js"
 import { apiErrors } from "../errors.js"
 import { admins } from "../constants.js"
 import {
-	validateDescriptionLength,
 	validateNameLength,
+	validateDescriptionLength,
 	validateUrl,
 	validateLogoUrl
 } from "../services/validationService.js"
@@ -47,6 +52,7 @@ export async function createPublisher(
 	// Create the publisher
 	return await context.prisma.publisher.create({
 		data: {
+			slug: stringToSlug(args.name),
 			name: args.name,
 			description: args.description,
 			url: args.url,

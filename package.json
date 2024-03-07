@@ -28,10 +28,13 @@
     "openai": "^4.28.0",
     "redis": "^4.6.13",
     "rss-parser": "^3.13.0",
-    "url-metadata": "^3.4.9"
+    "url-metadata": "^3.4.9",
+    "validator": "^13.11.0"
   },
   "devDependencies": {
+    "@types/jsdom": "^21.1.6",
     "@types/node": "^20.9.0",
+    "@types/validator": "^13.11.9",
     "concurrently": "^8.2.2",
     "dotenv": "^16.3.1",
     "prisma": "^5.9.1",
