@@ -46,9 +46,17 @@ export async function listArticles(
 
 	if (args.publishers != null) {
 		for (let uuid of args.publishers) {
-			let publisher = await context.prisma.publisher.findFirst({
-				where: { uuid }
-			})
+			let publisher: Publisher = null
+
+			if (validator.isUUID(uuid)) {
+				publisher = await context.prisma.publisher.findFirst({
+					where: { uuid }
+				})
+			} else {
+				publisher = await context.prisma.publisher.findFirst({
+					where: { slug: uuid }
+				})
+			}
 
 			if (publisher != null) {
 				publisherIds.push(publisher.id)
