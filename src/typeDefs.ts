@@ -37,6 +37,7 @@ export const typeDefs = `#graphql
 
 	type Publisher {
 		uuid: String!
+		slug: String!
 		name: String!
 		description: String!
 		url: String!
@@ -77,6 +78,7 @@ export const typeDefs = `#graphql
 	type Article {
 		uuid: String!
 		publisher: Publisher!
+		slug: String!
 		url: String!
 		title: String
 		description: String

@@ -1,4 +1,5 @@
 import { Publisher, Feed, Article } from "@prisma/client"
+import validator from "validator"
 import { ResolverContext, QueryResult, List } from "../types.js"
 import {
 	throwApiError,
@@ -131,11 +132,20 @@ export async function retrievePublisher(
 	args: { uuid: string },
 	context: ResolverContext
 ): Promise<QueryResult<Publisher>> {
-	return {
-		caching: true,
-		data: await context.prisma.publisher.findFirst({
-			where: { uuid: args.uuid }
-		})
+	if (validator.isUUID(args.uuid)) {
+		return {
+			caching: true,
+			data: await context.prisma.publisher.findFirst({
+				where: { uuid: args.uuid }
+			})
+		}
+	} else {
+		return {
+			caching: true,
+			data: await context.prisma.publisher.findFirst({
+				where: { slug: args.uuid }
+			})
+		}
 	}
 }
 

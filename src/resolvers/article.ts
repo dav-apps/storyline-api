@@ -2,6 +2,7 @@ import { Publisher, Feed, Article } from "@prisma/client"
 import { Readability, isProbablyReaderable } from "@mozilla/readability"
 import { JSDOM } from "jsdom"
 import axios from "axios"
+import validator from "validator"
 import { ResolverContext, QueryResult, List } from "../types.js"
 
 export async function retrieveArticle(
@@ -9,11 +10,20 @@ export async function retrieveArticle(
 	args: { uuid: string },
 	context: ResolverContext
 ): Promise<QueryResult<Article>> {
-	return {
-		caching: true,
-		data: await context.prisma.article.findFirst({
-			where: { uuid: args.uuid }
-		})
+	if (validator.isUUID(args.uuid)) {
+		return {
+			caching: true,
+			data: await context.prisma.article.findFirst({
+				where: { uuid: args.uuid }
+			})
+		}
+	} else {
+		return {
+			caching: true,
+			data: await context.prisma.article.findFirst({
+				where: { slug: args.uuid }
+			})
+		}
 	}
 }
 
