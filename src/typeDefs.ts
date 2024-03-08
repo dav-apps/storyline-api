@@ -43,6 +43,7 @@ export const typeDefs = `#graphql
 		url: String!
 		logoUrl: String!
 		feeds(
+			hasName: Boolean
 			limit: Int
 			offset: Int
 		): FeedList!

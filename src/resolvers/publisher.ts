@@ -214,6 +214,7 @@ export async function listPublishers(
 export async function feeds(
 	publisher: Publisher,
 	args: {
+		hasName?: boolean
 		limit?: number
 		offset?: number
 	},
@@ -225,7 +226,12 @@ export async function feeds(
 	let skip = args.offset ?? 0
 	if (skip < 0) skip = 0
 
-	let where = { publisherId: publisher.id }
+	let hasName = args.hasName ?? false
+	let where: any = { publisherId: publisher.id }
+
+	if (hasName) {
+		where.name = { not: null }
+	}
 
 	const [total, items] = await context.prisma.$transaction([
 		context.prisma.feed.count({ where }),
