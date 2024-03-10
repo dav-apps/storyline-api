@@ -31,6 +31,7 @@ export async function listArticles(
 	parent: any,
 	args: {
 		publishers?: string[]
+		excludeFeeds?: string[]
 		limit?: number
 		offset?: number
 	},
@@ -43,6 +44,7 @@ export async function listArticles(
 	if (skip < 0) skip = 0
 
 	let publisherIds: bigint[] = []
+	let excludeFeedIds: bigint[] = []
 
 	if (args.publishers != null) {
 		for (let uuid of args.publishers) {
@@ -64,12 +66,26 @@ export async function listArticles(
 		}
 	}
 
-	let where: any = {}
+	if (args.excludeFeeds != null) {
+		for (let uuid of args.excludeFeeds) {
+			let feed = await context.prisma.feed.findFirst({
+				where: { uuid }
+			})
+
+			if (feed != null) {
+				excludeFeedIds.push(feed.id)
+			}
+		}
+	}
+
+	let where: any = { feeds: {} }
 
 	if (publisherIds.length > 0) {
-		where = {
-			feeds: { some: { publisher: { id: { in: publisherIds } } } }
-		}
+		where.feeds.some = { publisher: { id: { in: publisherIds } } }
+	}
+
+	if (excludeFeedIds.length > 0) {
+		where.feeds.none = { uuid: { in: args.excludeFeeds } }
 	}
 
 	const [total, items] = await context.prisma.$transaction([
