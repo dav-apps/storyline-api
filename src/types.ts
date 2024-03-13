@@ -46,4 +46,19 @@ export interface User {
 	profileImage: string
 	profileImageEtag: string
 }
+
+export interface TableObject {
+	uuid: string
+	userId: number
+	tableId: number
+	properties: { [key: string]: string | number | boolean }
+}
+
+export interface Notification {
+	uuid: string
+	time: string
+	interval: number
+	title: string
+	body: string
+}
 //#endregion

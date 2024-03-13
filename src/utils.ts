@@ -1,10 +1,14 @@
+import { Article, Feed } from "@prisma/client"
 import { Response } from "express"
 import { GraphQLError } from "graphql"
 import Parser from "rss-parser"
 import urlMetadata from "url-metadata"
 import * as crypto from "crypto"
+import { DateTime } from "luxon"
+import { listTableObjects, createNotification } from "./services/apiService.js"
 import { ApiError } from "./types.js"
 import { apiErrors } from "./errors.js"
+import { appId } from "./constants.js"
 import { prisma } from "../server.js"
 
 export function throwApiError(error: ApiError) {
@@ -63,11 +67,9 @@ export async function fetchArticles() {
 		const feed = await parser.parseURL(f.url)
 
 		for (let feedItem of feed.items) {
-			if (feedItem.guid == null) continue
-
 			// Try to find the article in the database
 			const article = await prisma.article.findFirst({
-				where: { uuid: feedItem.guid },
+				where: { url: feedItem.link },
 				include: { feeds: true }
 			})
 
@@ -80,7 +82,7 @@ export async function fetchArticles() {
 				const imageUrl = metadata["og:image"]
 
 				try {
-					await prisma.article.create({
+					const article = await prisma.article.create({
 						data: {
 							uuid,
 							feeds: { connect: { id: f.id } },
@@ -93,6 +95,9 @@ export async function fetchArticles() {
 							content: feedItem.content?.trim()
 						}
 					})
+
+					// Send notifications for the article
+					await sendNotificationsForArticle(article, f)
 				} catch (error) {
 					console.error(error)
 				}
@@ -109,6 +114,33 @@ export async function fetchArticles() {
 				}
 			}
 		}
+	}
+}
+
+async function sendNotificationsForArticle(article: Article, feed: Feed) {
+	const publisher = await prisma.publisher.findFirst({
+		where: { id: feed.publisherId }
+	})
+
+	// Find all Notification table objects with the publisher of the feed
+	const listNotificationTableObjectsResult = await listTableObjects({
+		limit: 1000000,
+		appId,
+		tableName: "Notification",
+		propertyName: "publisher",
+		propertyValue: publisher.uuid,
+		exact: true
+	})
+
+	for (let notificationObj of listNotificationTableObjectsResult.items) {
+		await createNotification(`uuid`, {
+			userId: notificationObj.userId,
+			appId,
+			time: Math.floor(DateTime.now().toSeconds()),
+			interval: 0,
+			title: truncateString(article.title, 40),
+			body: truncateString(article.description, 150)
+		})
 	}
 }
 
@@ -133,4 +165,12 @@ export function stringToSlug(str: string): string {
 		.replace(/-+/g, "-") // collapse dashes
 
 	return str
+}
+
+function truncateString(str: string, n: number) {
+	if (str.length <= n) return str
+
+	const subString = str.slice(0, n - 1)
+
+	return subString.slice(0, subString.lastIndexOf(" ")) + "…"
 }
