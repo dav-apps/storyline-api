@@ -63,7 +63,6 @@ export const typeDefs = `#graphql
 		uuid: String!
 		url: String!
 		name: String
-		description: String
 		language: String
 		articles(
 			exclude: String

@@ -6,7 +6,6 @@ import { apiErrors } from "../errors.js"
 import { admins } from "../constants.js"
 import {
 	validateNameLength,
-	validateDescriptionLength,
 	validateUrl,
 	validateLanguage
 } from "../services/validationService.js"
@@ -48,15 +47,10 @@ export async function createFeed(
 	const feed = await parser.parseURL(args.url)
 
 	const name = feed.title
-	const description = feed.description
 	const language = (feed.language as string).toLowerCase() || "en"
 
 	// Validate the args
-	throwValidationError(
-		validateNameLength(name),
-		validateDescriptionLength(description),
-		validateLanguage(language)
-	)
+	throwValidationError(validateNameLength(name), validateLanguage(language))
 
 	// Create the feed
 	return await context.prisma.feed.create({
@@ -64,7 +58,6 @@ export async function createFeed(
 			publisherId: publisher.id,
 			url: args.url,
 			name,
-			description,
 			language
 		}
 	})
