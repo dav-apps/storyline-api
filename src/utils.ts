@@ -78,8 +78,15 @@ export async function fetchArticles() {
 				const title = feedItem.title
 
 				// Get the metadata, to get the image url
-				const metadata = await urlMetadata(feedItem.link)
-				const imageUrl = metadata["og:image"]
+				let imageUrl = ""
+
+				try {
+					const metadata = await urlMetadata(feedItem.link)
+					imageUrl = metadata["og:image"]
+				} catch (error) {
+					console.error(error)
+					continue
+				}
 
 				try {
 					const article = await prisma.article.create({
