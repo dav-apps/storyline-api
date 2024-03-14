@@ -107,7 +107,10 @@ BigInt.prototype["toJSON"] = function () {
 	return this.toString()
 }
 
-if (environment == Environment.Staging) {
+if (
+	environment == Environment.Staging ||
+	environment == Environment.Production
+) {
 	while (true) {
 		await fetchArticles()
 		await new Promise(resolve => setTimeout(resolve, 1000 * 60 * 60 * 6))
