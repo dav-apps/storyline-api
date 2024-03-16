@@ -8,6 +8,8 @@ export const admins = [1]
 
 //#region App & Table ids
 export const appId = 7
+export const notificationTableName = "Notification"
+export const notificationTablePublisherKey = "publisher"
 //#endregion
 
 //#region Regexes

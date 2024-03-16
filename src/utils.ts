@@ -5,10 +5,17 @@ import Parser from "rss-parser"
 import urlMetadata from "url-metadata"
 import * as crypto from "crypto"
 import { DateTime } from "luxon"
-import { listTableObjects, createNotification } from "./services/apiService.js"
+import {
+	listTableObjectsByProperty,
+	createNotification
+} from "./services/apiService.js"
 import { ApiError } from "./types.js"
 import { apiErrors } from "./errors.js"
-import { appId } from "./constants.js"
+import {
+	appId,
+	notificationTableName,
+	notificationTablePublisherKey
+} from "./constants.js"
 import { prisma } from "../server.js"
 
 export function throwApiError(error: ApiError) {
@@ -136,18 +143,28 @@ async function sendNotificationsForArticle(article: Article, feed: Feed) {
 	})
 
 	// Find all Notification table objects with the publisher of the feed
-	const listNotificationTableObjectsResult = await listTableObjects({
-		limit: 1000000,
-		appId,
-		tableName: "Notification",
-		propertyName: "publisher",
-		propertyValue: publisher.uuid,
-		exact: true
-	})
+	const listNotificationTableObjectsResult = await listTableObjectsByProperty(
+		`
+			total
+			items {
+				uuid
+				user {
+					id
+				}
+			}
+		`,
+		{
+			limit: 1000000,
+			appId,
+			tableName: notificationTableName,
+			propertyName: notificationTablePublisherKey,
+			propertyValue: publisher.uuid
+		}
+	)
 
 	for (let notificationObj of listNotificationTableObjectsResult.items) {
 		await createNotification(`uuid`, {
-			userId: notificationObj.userId,
+			userId: notificationObj.user.id,
 			appId,
 			time: Math.floor(DateTime.now().toSeconds()),
 			interval: 0,

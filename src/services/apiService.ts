@@ -58,64 +58,52 @@ export async function getUser(accessToken: string): Promise<UserApiResponse> {
 	}
 }
 
-export async function listTableObjects(params: {
-	caching?: boolean
-	limit?: number
-	offset?: number
-	collectionName?: string
-	tableName?: string
-	userId?: number
-	appId: number
-	propertyName?: string
-	propertyValue?: string
-	exact?: boolean
-}): Promise<List<TableObject>> {
-	try {
-		let requestParams: AxiosRequestConfig = {}
-
-		requestParams["app_id"] = appId
-		if (params.limit != null) requestParams["limit"] = params.limit
-		if (params.offset != null) requestParams["offset"] = params.offset
-		if (params.collectionName != null)
-			requestParams["collection_name"] = params.collectionName
-		if (params.tableName != null)
-			requestParams["table_name"] = params.tableName
-		if (params.userId != null) requestParams["user_id"] = params.userId
-		if (params.propertyName != null)
-			requestParams["property_name"] = params.propertyName
-		if (params.propertyValue != null)
-			requestParams["property_value"] = params.propertyValue
-		if (params.exact != null) requestParams["exact"] = params.exact
-		if (params.caching != null) requestParams["caching"] = params.caching
-
-		let response = await axios({
-			method: "get",
-			url: `${getApiBaseUrl()}/v2/table_objects`,
-			headers: {
-				Authorization: process.env.DAV_AUTH
-			},
-			params: requestParams
-		})
-
-		let result: TableObject[] = []
-
-		for (let obj of response.data.items) {
-			result.push({
-				uuid: obj.uuid,
-				userId: obj.user_id,
-				tableId: obj.table_id,
-				properties: obj.properties
-			})
-		}
-
-		return {
-			total: response.data.total,
-			items: result
-		}
-	} catch (error) {
-		console.error(error.response?.data || error)
-		return { total: 0, items: [] }
+export async function listTableObjectsByProperty(
+	queryData: string,
+	variables: {
+		userId?: number
+		appId: number
+		tableName?: string
+		propertyName: string
+		propertyValue: string
+		limit?: number
+		offset?: number
 	}
+): Promise<List<TableObject>> {
+	let result = await request<{
+		listTableObjectsByProperty: List<TableObject>
+	}>(
+		newApiBaseUrl,
+		gql`
+			query ListTableObjectsByProperty(
+				$userId: Int
+				$appId: Int!
+				$tableName: String
+				$propertyName: String!
+				$propertyValue: String!
+				$limit: Int
+				$offset: Int
+			) {
+				listTableObjectsByProperty(
+					userId: $userId
+					appId: $appId
+					tableName: $tableName
+					propertyName: $propertyName
+					propertyValue: $propertyValue
+					limit: $limit
+					offset: $offset
+				) {
+					${queryData}
+				}
+			}
+		`,
+		variables,
+		{
+			Authorization: process.env.DAV_AUTH
+		}
+	)
+
+	return result.listTableObjectsByProperty
 }
 
 export async function createNotification(
