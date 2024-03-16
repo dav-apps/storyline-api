@@ -59,9 +59,11 @@ function sendEndpointError(res: Response, error: ApiError) {
 	})
 }
 
-export async function fetchArticles() {
+export async function fetchArticles(): Promise<{ newArticlesCount: number }> {
 	const parser = new Parser()
 	const feeds = await prisma.feed.findMany()
+
+	let newArticlesCount = 0
 
 	for (let f of feeds) {
 		const feed = await parser.parseURL(f.url)
@@ -105,6 +107,8 @@ export async function fetchArticles() {
 
 					// Send notifications for the article
 					await sendNotificationsForArticle(article, f)
+
+					newArticlesCount++
 				} catch (error) {
 					console.error(error)
 				}
@@ -122,6 +126,8 @@ export async function fetchArticles() {
 			}
 		}
 	}
+
+	return { newArticlesCount }
 }
 
 async function sendNotificationsForArticle(article: Article, feed: Feed) {

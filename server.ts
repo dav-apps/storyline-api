@@ -8,6 +8,7 @@ import cors from "cors"
 import { PrismaClient } from "@prisma/client"
 import OpenAI from "openai"
 import { createClient } from "redis"
+import { DateTime } from "luxon"
 import { Dav, Environment, isSuccessStatusCode } from "dav-js"
 import { getUser } from "./src/services/apiService.js"
 import { typeDefs } from "./src/typeDefs.js"
@@ -112,7 +113,16 @@ if (
 	environment == Environment.Production
 ) {
 	while (true) {
-		await fetchArticles()
+		const before = DateTime.now()
+		let result = await fetchArticles()
+
+		console.log("---------------")
+		console.log(`Start time: ${before.toString()}`)
+		console.log(
+			`Runtime: ${Math.floor(-before.diffNow("minutes").minutes)} minutes`
+		)
+		console.log(`${result.newArticlesCount} new articles added`)
+
 		await new Promise(resolve => setTimeout(resolve, 1000 * 60 * 60 * 6))
 	}
 }
