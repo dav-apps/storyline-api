@@ -11,6 +11,7 @@ export const typeDefs = `#graphql
 		listArticles(
 			publishers: [String!]
 			excludeFeeds: [String!]
+			languages: [String!]
 			limit: Int
 			offset: Int
 		): ArticleList!

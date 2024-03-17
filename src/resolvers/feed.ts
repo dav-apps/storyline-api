@@ -47,7 +47,8 @@ export async function createFeed(
 	const feed = await parser.parseURL(args.url)
 
 	const name = feed.title
-	const language = (feed.language as string).toLowerCase() || "en"
+	const language =
+		(feed.language as string)?.toLowerCase().split("-")[0] ?? "en"
 
 	// Validate the args
 	throwValidationError(validateNameLength(name), validateLanguage(language))

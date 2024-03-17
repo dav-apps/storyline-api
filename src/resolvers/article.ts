@@ -32,6 +32,7 @@ export async function listArticles(
 	args: {
 		publishers?: string[]
 		excludeFeeds?: string[]
+		languages?: string[]
 		limit?: number
 		offset?: number
 	},
@@ -45,6 +46,7 @@ export async function listArticles(
 
 	let publisherIds: bigint[] = []
 	let excludeFeedIds: bigint[] = []
+	let languages: string[] = []
 
 	if (args.publishers != null) {
 		for (let uuid of args.publishers) {
@@ -78,10 +80,18 @@ export async function listArticles(
 		}
 	}
 
+	if (args.languages != null) {
+		for (let lang of args.languages) {
+			languages.push(lang.split("-")[0])
+		}
+	}
+
 	let where: any = { feeds: {} }
 
 	if (publisherIds.length > 0) {
 		where.feeds.some = { publisher: { id: { in: publisherIds } } }
+	} else if (args.languages != null && args.languages.length > 0) {
+		where.feeds.every = { language: { in: languages } }
 	}
 
 	if (excludeFeedIds.length > 0) {
