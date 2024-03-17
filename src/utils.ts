@@ -12,6 +12,9 @@ import {
 import { ApiError } from "./types.js"
 import { apiErrors } from "./errors.js"
 import {
+	apiBaseUrlDevelopment,
+	apiBaseUrlStaging,
+	apiBaseUrlProduction,
 	appId,
 	notificationTableName,
 	notificationTablePublisherKey
@@ -64,6 +67,17 @@ function sendEndpointError(res: Response, error: ApiError) {
 		code: error.code,
 		message: error.message
 	})
+}
+
+export function getApiBaseUrl(): string {
+	switch (process.env.ENVIRONMENT) {
+		case "staging":
+			return apiBaseUrlStaging
+		case "production":
+			return apiBaseUrlProduction
+		default:
+			return apiBaseUrlDevelopment
+	}
 }
 
 export async function fetchArticles(): Promise<{ newArticlesCount: number }> {

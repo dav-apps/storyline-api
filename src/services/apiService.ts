@@ -1,24 +1,8 @@
-import axios, { AxiosRequestConfig } from "axios"
+import axios from "axios"
 import { request, gql } from "graphql-request"
+import { getApiBaseUrl } from "../utils.js"
 import { List, UserApiResponse, TableObject, Notification } from "../types.js"
-import {
-	apiBaseUrlDevelopment,
-	apiBaseUrlStaging,
-	apiBaseUrlProduction,
-	newApiBaseUrl,
-	appId
-} from "../constants.js"
-
-function getApiBaseUrl() {
-	switch (process.env.ENVIRONMENT) {
-		case "staging":
-			return apiBaseUrlStaging
-		case "production":
-			return apiBaseUrlProduction
-		default:
-			return apiBaseUrlDevelopment
-	}
-}
+import { newApiBaseUrl } from "../constants.js"
 
 export async function getUser(accessToken: string): Promise<UserApiResponse> {
 	if (accessToken == null) {
@@ -116,6 +100,9 @@ export async function createNotification(
 		interval: number
 		title: string
 		body: string
+		icon?: string
+		image?: string
+		href?: string
 	}
 ): Promise<Notification> {
 	let result = await request<{
@@ -131,6 +118,9 @@ export async function createNotification(
 				$interval: Int!
 				$title: String!
 				$body: String!
+				$icon: String
+				$image: String
+				$href: String
 			) {
 				createNotification(
 					uuid: $uuid
@@ -140,6 +130,9 @@ export async function createNotification(
 					interval: $interval
 					title: $title
 					body: $body
+					icon: $icon
+					image: $image
+					href: $href
 				) {
 					${queryData}
 				}
