@@ -197,7 +197,8 @@ export async function listPublishers(
 			context.prisma.publisher.count(),
 			context.prisma.publisher.findMany({
 				take,
-				skip
+				skip,
+				orderBy: { name: "asc" }
 			})
 		])
 
