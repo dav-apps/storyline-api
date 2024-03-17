@@ -4,6 +4,10 @@ export const apiBaseUrlStaging =
 export const apiBaseUrlProduction =
 	"https://dav-backend-tfpik.ondigitalocean.app"
 export const newApiBaseUrl = "https://dav-api-staging-sojqu.ondigitalocean.app"
+export const websiteBaseUrlDevelopment = "http://localhost:3004"
+export const websiteBaseUrlStaging =
+	"https://storyline-staging-a6ylk.ondigitalocean.app"
+export const websiteBaseUrlProduction = "https://storyline.press"
 export const admins = [1]
 
 //#region App & Table ids

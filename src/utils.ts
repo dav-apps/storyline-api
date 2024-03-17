@@ -15,6 +15,9 @@ import {
 	apiBaseUrlDevelopment,
 	apiBaseUrlStaging,
 	apiBaseUrlProduction,
+	websiteBaseUrlDevelopment,
+	websiteBaseUrlStaging,
+	websiteBaseUrlProduction,
 	appId,
 	notificationTableName,
 	notificationTablePublisherKey
@@ -77,6 +80,17 @@ export function getApiBaseUrl(): string {
 			return apiBaseUrlProduction
 		default:
 			return apiBaseUrlDevelopment
+	}
+}
+
+export function getWebsiteBaseUrl(): string {
+	switch (process.env.ENVIRONMENT) {
+		case "staging":
+			return websiteBaseUrlStaging
+		case "production":
+			return websiteBaseUrlProduction
+		default:
+			return websiteBaseUrlDevelopment
 	}
 }
 
@@ -183,7 +197,10 @@ async function sendNotificationsForArticle(article: Article, feed: Feed) {
 			time: Math.floor(DateTime.now().toSeconds()),
 			interval: 0,
 			title: truncateString(article.title, 40),
-			body: truncateString(article.description, 150)
+			body: truncateString(article.description, 150),
+			icon: publisher.logoUrl,
+			image: article.imageUrl,
+			href: `${getWebsiteBaseUrl()}/article/${article.slug}`
 		})
 	}
 }
