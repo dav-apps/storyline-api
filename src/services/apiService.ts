@@ -50,6 +50,7 @@ export async function listTableObjectsByProperty(
 		tableName?: string
 		propertyName: string
 		propertyValue: string
+		exact?: boolean
 		limit?: number
 		offset?: number
 	}
@@ -65,6 +66,7 @@ export async function listTableObjectsByProperty(
 				$tableName: String
 				$propertyName: String!
 				$propertyValue: String!
+				$exact: Boolean
 				$limit: Int
 				$offset: Int
 			) {
@@ -74,6 +76,7 @@ export async function listTableObjectsByProperty(
 					tableName: $tableName
 					propertyName: $propertyName
 					propertyValue: $propertyValue
+					exact: $exact
 					limit: $limit
 					offset: $offset
 				) {

@@ -19,6 +19,9 @@ import {
 	websiteBaseUrlStaging,
 	websiteBaseUrlProduction,
 	appId,
+	followTableName,
+	followTablePublisherKey,
+	followTableExcludedFeedsKey,
 	notificationTableName,
 	notificationTablePublisherKey
 } from "./constants.js"
@@ -190,6 +193,45 @@ async function sendNotificationsForArticle(article: Article, feed: Feed) {
 	)
 
 	for (let notificationObj of listNotificationTableObjectsResult.items) {
+		// Get the follow table object
+		const listFollowTableObjectsResult = await listTableObjectsByProperty(
+			`
+				total
+				items {
+					uuid
+					properties
+				}
+			`,
+			{
+				limit: 1,
+				appId,
+				userId: notificationObj.user.id,
+				tableName: followTableName,
+				propertyName: followTablePublisherKey,
+				propertyValue: publisher.uuid
+			}
+		)
+
+		if (
+			listFollowTableObjectsResult == null ||
+			listFollowTableObjectsResult.total == 0
+		) {
+			continue
+		}
+
+		// Check if the user has excluded the feed
+		let properties = listFollowTableObjectsResult.items[0].properties
+		let excludedFeedsProperty = properties[
+			followTableExcludedFeedsKey
+		] as string
+
+		if (
+			excludedFeedsProperty != null &&
+			excludedFeedsProperty.includes(feed.uuid)
+		) {
+			continue
+		}
+
 		await createNotification(`uuid`, {
 			userId: notificationObj.user.id,
 			appId,
@@ -219,12 +261,10 @@ export function stringToSlug(str: string): string {
 		str = str.replace(new RegExp(from.charAt(i), "g"), to.charAt(i))
 	}
 
-	str = str
+	return str
 		.replace(/[^a-z0-9 -]/g, "") // remove invalid chars
 		.replace(/\s+/g, "-") // collapse whitespace and replace by -
 		.replace(/-+/g, "-") // collapse dashes
-
-	return str
 }
 
 function truncateString(str: string, n: number) {

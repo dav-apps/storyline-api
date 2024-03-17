@@ -12,6 +12,9 @@ export const admins = [1]
 
 //#region App & Table ids
 export const appId = 7
+export const followTableName = "Follow"
+export const followTablePublisherKey = "publisher"
+export const followTableExcludedFeedsKey = "excludedFeeds"
 export const notificationTableName = "Notification"
 export const notificationTablePublisherKey = "publisher"
 //#endregion
