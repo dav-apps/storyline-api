@@ -121,7 +121,6 @@ export async function fetchArticles(): Promise<{ newArticlesCount: number }> {
 					const metadata = await urlMetadata(feedItem.link)
 					imageUrl = metadata["og:image"]
 				} catch (error) {
-					console.error(error)
 					continue
 				}
 

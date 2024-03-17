@@ -39,7 +39,6 @@ export const redis = createClient({
 	database: process.env.ENVIRONMENT == "production" ? 9 : 8 // production: 9, staging: 8
 })
 
-redis.on("error", err => console.log("Redis Client Error", err))
 await redis.connect()
 //#endregion
 
