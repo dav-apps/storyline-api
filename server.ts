@@ -112,6 +112,12 @@ if (
 	environment == Environment.Staging ||
 	environment == Environment.Production
 ) {
+	let interval = 1000 * 60 * 60 * 6 // 6 hours
+
+	if (environment == Environment.Production) {
+		interval = 1000 * 60 * 60 // 1 hour
+	}
+
 	while (true) {
 		const before = DateTime.now()
 		let result = await fetchArticles()
@@ -123,6 +129,6 @@ if (
 		)
 		console.log(`${result.newArticlesCount} new articles added`)
 
-		await new Promise(resolve => setTimeout(resolve, 1000 * 60 * 60 * 6))
+		await new Promise(resolve => setTimeout(resolve, interval))
 	}
 }
