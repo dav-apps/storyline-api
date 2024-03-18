@@ -153,6 +153,7 @@ export async function listPublishers(
 	parent: any,
 	args: {
 		random?: boolean
+		languages?: string[]
 		limit?: number
 		offset?: number
 	},
@@ -165,9 +166,23 @@ export async function listPublishers(
 	if (skip < 0) skip = 0
 
 	const random = args.random || false
+	let languages: string[] = []
+	let where = {}
+
+	if (args.languages != null) {
+		for (let lang of args.languages) {
+			languages.push(lang.split("-")[0])
+		}
+
+		where = { feeds: { some: { language: { in: languages } } } }
+	}
 
 	if (random) {
-		let total = await context.prisma.publisher.count()
+		let total = await context.prisma.publisher.count({
+			where,
+			orderBy: { id: "asc" }
+		})
+
 		if (take > total) take = total
 
 		let indices = []
@@ -182,7 +197,13 @@ export async function listPublishers(
 		}
 
 		for (let i of indices) {
-			items.push(await context.prisma.publisher.findFirst({ skip: i }))
+			items.push(
+				await context.prisma.publisher.findFirst({
+					where,
+					orderBy: { id: "asc" },
+					skip: i
+				})
+			)
 		}
 
 		return {
@@ -194,8 +215,9 @@ export async function listPublishers(
 		}
 	} else {
 		const [total, items] = await context.prisma.$transaction([
-			context.prisma.publisher.count(),
+			context.prisma.publisher.count({ where }),
 			context.prisma.publisher.findMany({
+				where,
 				take,
 				skip,
 				orderBy: { name: "asc" }
