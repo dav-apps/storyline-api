@@ -15,6 +15,9 @@ import {
 	apiBaseUrlDevelopment,
 	apiBaseUrlStaging,
 	apiBaseUrlProduction,
+	newApiBaseUrlDevelopment,
+	newApiBaseUrlStaging,
+	newApiBaseUrlProduction,
 	websiteBaseUrlDevelopment,
 	websiteBaseUrlStaging,
 	websiteBaseUrlProduction,
@@ -83,6 +86,17 @@ export function getApiBaseUrl(): string {
 			return apiBaseUrlProduction
 		default:
 			return apiBaseUrlDevelopment
+	}
+}
+
+export function getNewApiBaseUrl(): string {
+	switch (process.env.ENVIRONMENT) {
+		case "staging":
+			return newApiBaseUrlStaging
+		case "production":
+			return newApiBaseUrlProduction
+		default:
+			return newApiBaseUrlDevelopment
 	}
 }
 

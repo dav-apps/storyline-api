@@ -1,8 +1,7 @@
 import axios from "axios"
 import { request, gql } from "graphql-request"
-import { getApiBaseUrl } from "../utils.js"
+import { getApiBaseUrl, getNewApiBaseUrl } from "../utils.js"
 import { List, UserApiResponse, TableObject, Notification } from "../types.js"
-import { newApiBaseUrl } from "../constants.js"
 
 export async function getUser(accessToken: string): Promise<UserApiResponse> {
 	if (accessToken == null) {
@@ -58,7 +57,7 @@ export async function listTableObjectsByProperty(
 	let result = await request<{
 		listTableObjectsByProperty: List<TableObject>
 	}>(
-		newApiBaseUrl,
+		getNewApiBaseUrl(),
 		gql`
 			query ListTableObjectsByProperty(
 				$userId: Int
@@ -111,7 +110,7 @@ export async function createNotification(
 	let result = await request<{
 		createNotification: Notification
 	}>(
-		newApiBaseUrl,
+		getNewApiBaseUrl(),
 		gql`
 			mutation CreateNotification(
 				$uuid: String
