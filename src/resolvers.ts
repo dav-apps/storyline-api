@@ -69,7 +69,8 @@ export const resolvers = {
 				args,
 				context,
 				info,
-				articleResolvers.listArticles
+				articleResolvers.listArticles,
+				true
 			)
 	},
 	Mutation: {
@@ -86,7 +87,8 @@ export const resolvers = {
 				args,
 				context,
 				info,
-				publisherResolvers.articles
+				publisherResolvers.articles,
+				true
 			)
 	},
 	Feed: {

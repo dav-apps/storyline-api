@@ -25,9 +25,13 @@ export async function cachingResolver(
 	args: any,
 	context: ResolverContext,
 	info: any,
-	resolver: Function
+	resolver: Function,
+	skipCachingForPlusUsers: boolean = false
 ) {
-	if (process.env.CACHING == "false") {
+	if (
+		process.env.CACHING == "false" ||
+		(skipCachingForPlusUsers && context.user != null && context.user.plan > 0)
+	) {
 		let result: QueryResult<any> = await resolver(parent, args, context)
 		return result.data
 	}
@@ -49,7 +53,7 @@ export async function cachingResolver(
 
 	if (result.caching) {
 		await context.redis.set(key, JSON.stringify(result.data))
-		await context.redis.expire(key, 60 * 60 * 3) // Expire after 3 hours
+		await context.redis.expire(key, result.expiration ?? 60 * 60 * 24) // Expire after 24 hours
 	}
 
 	return result.data
