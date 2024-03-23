@@ -12,6 +12,7 @@ export interface ResolverContext {
 
 export interface QueryResult<T> {
 	caching: boolean
+	expiration?: number
 	data: T
 }
 

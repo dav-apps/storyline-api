@@ -110,6 +110,7 @@ export async function listArticles(
 
 	return {
 		caching: true,
+		expiration: 60 * 60 * 2, // 2 hours
 		data: {
 			total,
 			items
