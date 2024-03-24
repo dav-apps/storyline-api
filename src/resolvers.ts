@@ -1,5 +1,8 @@
 import { ResolverContext } from "./types.js"
-import { cachingResolver } from "./services/cachingService.js"
+import {
+	cachingResolver,
+	feedCachingResolver
+} from "./services/cachingService.js"
 import * as publisherResolvers from "./resolvers/publisher.js"
 import * as feedResolvers from "./resolvers/feed.js"
 import * as articleResolvers from "./resolvers/article.js"
@@ -64,13 +67,12 @@ export const resolvers = {
 			context: ResolverContext,
 			info: any
 		) =>
-			cachingResolver(
+			feedCachingResolver(
 				parent,
 				args,
 				context,
 				info,
-				articleResolvers.listArticles,
-				true
+				articleResolvers.listArticles
 			)
 	},
 	Mutation: {

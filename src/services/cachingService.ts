@@ -61,3 +61,49 @@ export async function cachingResolver(
 
 	return result.data
 }
+
+export async function feedCachingResolver(
+	parent: any,
+	args: { excludeFeeds?: string[] },
+	context: ResolverContext,
+	info: any,
+	resolver: Function
+) {
+	if (process.env.CACHING == "false") {
+		let result: QueryResult<any> = await resolver(parent, args, context)
+		return result.data
+	}
+
+	if (
+		context.user == null ||
+		context.user.plan == 0 ||
+		args.excludeFeeds == null
+	) {
+		return await cachingResolver(parent, args, context, info, resolver, true)
+	}
+
+	// Check if the result is cached
+	let key = generateUserFeedCacheKey(args)
+	let cachedResult = await context.redis.get(key)
+
+	if (cachedResult != null) {
+		// Reset the expiration time
+		await context.redis.expire(key, feedCacheExpiration)
+
+		return JSON.parse(cachedResult)
+	}
+
+	// Call the resolver function and save the result
+	let result: QueryResult<any> = await resolver(parent, args, context)
+
+	if (result.caching) {
+		await context.redis.set(key, JSON.stringify(result.data))
+		await context.redis.expire(key, feedCacheExpiration)
+	}
+
+	return result.data
+}
+
+function generateUserFeedCacheKey(args: object): string {
+	return `feed,${JSON.stringify(args)}`
+}
