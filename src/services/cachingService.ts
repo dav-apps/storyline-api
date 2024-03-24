@@ -1,12 +1,12 @@
 import { ResolverContext, QueryResult } from "../types.js"
+import { defaultCacheExpiration, feedCacheExpiration } from "../constants.js"
 
 function generateCacheKey(
 	resolverName: string,
 	uuid: string,
 	args: object
 ): string {
-	let environment = process.env.ENVIRONMENT || "development"
-	let result = `${resolverName}-${environment}`
+	let result = `${resolverName}`
 
 	if (uuid != null) {
 		result += `:${uuid}`
@@ -53,7 +53,10 @@ export async function cachingResolver(
 
 	if (result.caching) {
 		await context.redis.set(key, JSON.stringify(result.data))
-		await context.redis.expire(key, result.expiration ?? 60 * 60 * 24) // Expire after 24 hours
+		await context.redis.expire(
+			key,
+			result.expiration ?? defaultCacheExpiration
+		)
 	}
 
 	return result.data

@@ -12,7 +12,12 @@ export const websiteBaseUrlDevelopment = "http://localhost:3004"
 export const websiteBaseUrlStaging =
 	"https://storyline-staging-a6ylk.ondigitalocean.app"
 export const websiteBaseUrlProduction = "https://storyline.press"
+
+//#region Misc
 export const admins = [1]
+export const defaultCacheExpiration = 60 * 60 * 24 // 24 hours
+export const feedCacheExpiration = 60 * 60 * 24 * 10 // 10 days
+//#endregion
 
 //#region App & Table ids
 export const appId = 7
