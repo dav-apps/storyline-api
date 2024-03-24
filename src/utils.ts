@@ -5,6 +5,7 @@ import Parser from "rss-parser"
 import urlMetadata from "url-metadata"
 import * as crypto from "crypto"
 import { DateTime } from "luxon"
+import { listArticles } from "./resolvers/article.js"
 import {
 	listTableObjectsByProperty,
 	createNotification
@@ -28,7 +29,7 @@ import {
 	notificationTableName,
 	notificationTablePublisherKey
 } from "./constants.js"
-import { prisma } from "../server.js"
+import { prisma, redis, openai } from "../server.js"
 
 export function throwApiError(error: ApiError) {
 	throw new GraphQLError(error.message, {
@@ -179,6 +180,33 @@ export async function fetchArticles(): Promise<{ newArticlesCount: number }> {
 	}
 
 	return { newArticlesCount }
+}
+
+export async function updateFeedCaches(): Promise<{
+	updatedFeedsCount: number
+}> {
+	let keys = await redis.keys("feed,*")
+	let updatedFeedsCount = 0
+
+	for (let key of keys) {
+		// Retrieve the params from the key
+		let rawParams = key.split(",")
+		rawParams.splice(0, 1)
+		let paramsString = rawParams.join(",")
+		let params: any = null
+
+		try {
+			params = JSON.parse(paramsString)
+		} catch (error) {
+			continue
+		}
+
+		let result = await listArticles(null, params, { prisma, redis, openai })
+		await redis.set(key, JSON.stringify(result.data), { KEEPTTL: true })
+		updatedFeedsCount++
+	}
+
+	return { updatedFeedsCount }
 }
 
 async function sendNotificationsForArticle(article: Article, feed: Feed) {

@@ -14,7 +14,7 @@ import { getUser } from "./src/services/apiService.js"
 import { typeDefs } from "./src/typeDefs.js"
 import { resolvers } from "./src/resolvers.js"
 import { User } from "./src/types.js"
-import { throwApiError, fetchArticles } from "./src/utils.js"
+import { throwApiError, fetchArticles, updateFeedCaches } from "./src/utils.js"
 import { apiErrors } from "./src/errors.js"
 import "dotenv/config"
 
@@ -29,7 +29,7 @@ let schema = makeExecutableSchema({
 
 export const prisma = new PrismaClient()
 
-const openai = new OpenAI({
+export const openai = new OpenAI({
 	apiKey: process.env.OPENAI_SECRET_KEY
 })
 
@@ -119,15 +119,30 @@ if (
 	}
 
 	while (true) {
-		const before = DateTime.now()
-		let result = await fetchArticles()
+		let before = DateTime.now()
 
 		console.log("---------------")
+		console.log("Starting to fetch articles...")
 		console.log(`Start time: ${before.toString()}`)
+
+		let fetchArticlesResult = await fetchArticles()
+
+		console.log(`${fetchArticlesResult.newArticlesCount} new articles added`)
 		console.log(
 			`Runtime: ${Math.floor(-before.diffNow("minutes").minutes)} minutes`
 		)
-		console.log(`${result.newArticlesCount} new articles added`)
+
+		before = DateTime.now()
+
+		console.log("\nStarting to update feed caches...")
+		console.log(`Start time: ${before.toString()}`)
+
+		let updateFeedCachesResult = await updateFeedCaches()
+
+		console.log(`${updateFeedCachesResult.updatedFeedsCount} caches updated`)
+		console.log(
+			`Runtime: ${Math.floor(-before.diffNow("minutes").minutes)} minutes`
+		)
 
 		await new Promise(resolve => setTimeout(resolve, interval))
 	}
