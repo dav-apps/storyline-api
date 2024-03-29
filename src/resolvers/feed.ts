@@ -51,7 +51,7 @@ export async function createFeed(
 		(feed.language as string)?.toLowerCase().split("-")[0] ?? "en"
 
 	// Validate the args
-	throwValidationError(validateNameLength(name), validateLanguage(language))
+	throwValidationError(validateLanguage(language))
 
 	// Create the feed
 	return await context.prisma.feed.create({
