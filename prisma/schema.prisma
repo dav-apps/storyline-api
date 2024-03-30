@@ -8,13 +8,15 @@ datasource db {
 }
 
 model Publisher {
-  id          BigInt @id @default(autoincrement())
-  uuid        String @unique @default(uuid()) @db.VarChar
-  slug        String @unique @default(uuid()) @db.VarChar
-  name        String @db.VarChar
-  description String @db.VarChar
-  url         String @db.VarChar
-  logoUrl     String @db.VarChar
+  id          BigInt   @id @default(autoincrement())
+  uuid        String   @unique @default(uuid()) @db.VarChar
+  slug        String   @unique @default(uuid()) @db.VarChar
+  name        String   @db.VarChar
+  description String   @db.VarChar
+  url         String   @db.VarChar
+  logoUrl     String   @db.VarChar
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
   feeds       Feed[]
 }
 
@@ -25,6 +27,8 @@ model Feed {
   url         String    @db.VarChar
   name        String?   @db.VarChar
   language    String    @db.VarChar
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now()) @updatedAt
   publisher   Publisher @relation(fields: [publisherId], references: [id])
   articles    Article[]
 }
@@ -40,5 +44,7 @@ model Article {
   imageUrl    String?  @db.VarChar
   content     String?  @db.Text
   summary     String?  @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
   feeds       Feed[]
 }
