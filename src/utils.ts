@@ -119,7 +119,15 @@ export async function fetchArticles(): Promise<{ newArticlesCount: number }> {
 	let newArticlesCount = 0
 
 	for (let f of feeds) {
-		const feed = await parser.parseURL(f.url)
+		let feed = null
+
+		try {
+			feed = await parser.parseURL(f.url)
+		} catch (error) {
+			console.error("Error in trying to parse the following URL: ", f.url)
+			console.error(error)
+			continue
+		}
 
 		for (let feedItem of feed.items) {
 			// Try to find the article in the database

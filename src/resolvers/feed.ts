@@ -4,11 +4,7 @@ import { ResolverContext, QueryResult, List } from "../types.js"
 import { throwApiError, throwValidationError } from "../utils.js"
 import { apiErrors } from "../errors.js"
 import { admins } from "../constants.js"
-import {
-	validateNameLength,
-	validateUrl,
-	validateLanguage
-} from "../services/validationService.js"
+import { validateUrl, validateLanguage } from "../services/validationService.js"
 
 export async function createFeed(
 	parent: any,
