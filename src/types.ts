@@ -1,11 +1,13 @@
 import { PrismaClient } from "@prisma/client"
 import { RedisClientType } from "redis"
 import OpenAI from "openai"
+import { Telegraf } from "telegraf"
 
 export interface ResolverContext {
 	prisma: PrismaClient
 	redis: RedisClientType<any, any, any>
 	openai: OpenAI
+	telegraf: Telegraf
 	accessToken?: string
 	user?: User
 }

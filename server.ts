@@ -9,6 +9,7 @@ import { PrismaClient } from "@prisma/client"
 import OpenAI from "openai"
 import { createClient } from "redis"
 import { DateTime } from "luxon"
+import { Telegraf } from "telegraf"
 import { Dav, Environment, isSuccessStatusCode } from "dav-js"
 import { getUser } from "./src/services/apiService.js"
 import { typeDefs } from "./src/typeDefs.js"
@@ -32,6 +33,8 @@ export const prisma = new PrismaClient()
 export const openai = new OpenAI({
 	apiKey: process.env.OPENAI_SECRET_KEY
 })
+
+export const telegraf = new Telegraf(process.env.BOT_TOKEN)
 
 //#region Redis config
 export const redis = createClient({
@@ -94,6 +97,7 @@ app.use(
 				prisma,
 				redis,
 				openai,
+				telegraf,
 				accessToken,
 				user
 			}
