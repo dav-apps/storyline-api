@@ -29,7 +29,7 @@ import {
 	notificationTableName,
 	notificationTablePublisherKey
 } from "./constants.js"
-import { prisma, redis, openai } from "../server.js"
+import { prisma, redis, openai, telegraf } from "../server.js"
 
 export function throwApiError(error: ApiError) {
 	throw new GraphQLError(error.message, {
@@ -167,6 +167,7 @@ export async function fetchArticles(): Promise<{ newArticlesCount: number }> {
 
 					// Send notifications for the article
 					await sendNotificationsForArticle(article, f)
+					await sendTelegramMessage(article, f)
 
 					newArticlesCount++
 				} catch (error) {
@@ -209,7 +210,12 @@ export async function updateFeedCaches(): Promise<{
 			continue
 		}
 
-		let result = await listArticles(null, params, { prisma, redis, openai })
+		let result = await listArticles(null, params, {
+			prisma,
+			redis,
+			openai,
+			telegraf
+		})
 		await redis.set(key, JSON.stringify(result.data), { KEEPTTL: true })
 		updatedFeedsCount++
 	}
@@ -294,6 +300,18 @@ async function sendNotificationsForArticle(article: Article, feed: Feed) {
 			href: `${getWebsiteBaseUrl()}/article/${article.slug}`
 		})
 	}
+}
+
+export async function sendTelegramMessage(article: Article, feed: Feed) {
+	if (feed.telegramChannelId == null) return
+
+	let message = `<a href="${getWebsiteBaseUrl()}/article/${article.slug}">${
+		article.title
+	}</a>`
+
+	await telegraf.telegram.sendMessage(feed.telegramChannelId, message, {
+		parse_mode: "HTML"
+	})
 }
 
 export function randomNumber(min: number, max: number) {
