@@ -34,7 +34,7 @@ export const openai = new OpenAI({
 	apiKey: process.env.OPENAI_SECRET_KEY
 })
 
-export const telegraf = new Telegraf(process.env.BOT_TOKEN)
+export const telegraf = new Telegraf(process.env.TELEGRAM_BOT_TOKEN)
 
 //#region Redis config
 export const redis = createClient({
