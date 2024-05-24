@@ -305,9 +305,9 @@ async function sendNotificationsForArticle(article: Article, feed: Feed) {
 export async function sendTelegramMessage(article: Article, feed: Feed) {
 	if (feed.telegramChannelId == null) return
 
-	let message = `<a href="${getWebsiteBaseUrl()}/article/${article.slug}">${
-		article.title
-	}</a>`
+	let message = `<a href="${getWebsiteBaseUrl()}/article/${
+		article.slug
+	}?utm_source=telegram">${article.title}</a>`
 
 	await telegraf.telegram.sendMessage(feed.telegramChannelId, message, {
 		parse_mode: "HTML"
