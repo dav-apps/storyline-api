@@ -309,9 +309,16 @@ export async function sendTelegramMessage(article: Article, feed: Feed) {
 		article.slug
 	}?utm_source=telegram">${article.title}</a>`
 
-	await telegraf.telegram.sendMessage(feed.telegramChannelId, message, {
-		parse_mode: "HTML"
-	})
+	try {
+		await telegraf.telegram.sendMessage(feed.telegramChannelId, message, {
+			parse_mode: "HTML"
+		})
+	} catch (error) {
+		console.error(
+			`Error in sending a message to the telegram channel ${feed.telegramChannelId}:\n\n${message}`
+		)
+		console.error(error)
+	}
 }
 
 export function randomNumber(min: number, max: number) {
