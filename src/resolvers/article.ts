@@ -172,19 +172,22 @@ export async function summary(
 
 		const language = a.feeds[0].language
 
-		let prompt =
-			"Summarize the following text. Use HTML for headers and breaks."
+		let prompt = "Summarize the article. Use HTML for headers and breaks."
 
 		if (language.startsWith("de")) {
 			prompt =
-				"Fasse den folgenden Text zuammen. Verwende HTML für Überschriften und Umbrüche."
+				"Fasse den Artikel zusammen. Verwende HTML für Überschriften und Umbrüche."
 		}
 
 		const completion = await context.openai.chat.completions.create({
 			messages: [
 				{
+					role: "system",
+					content: prompt
+				},
+				{
 					role: "user",
-					content: `${prompt}\n\n${textContent}`
+					content: textContent
 				}
 			],
 			model: "gpt-3.5-turbo"
