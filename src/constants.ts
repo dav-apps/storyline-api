@@ -4,8 +4,7 @@ export const apiBaseUrlStaging =
 export const apiBaseUrlProduction =
 	"https://dav-backend-tfpik.ondigitalocean.app"
 export const newApiBaseUrlDevelopment = "http://localhost:4000"
-export const newApiBaseUrlStaging =
-	"https://dav-api-staging-sojqu.ondigitalocean.app"
+export const newApiBaseUrlStaging = "https://dav-api-staging-kb5tf.ondigitalocean.app"
 export const newApiBaseUrlProduction =
 	"https://dav-api-ax6gp.ondigitalocean.app"
 export const websiteBaseUrlDevelopment = "http://localhost:3004"
