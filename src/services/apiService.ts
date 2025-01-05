@@ -92,7 +92,7 @@ export async function listTableObjectsByProperty(
 	return result.listTableObjectsByProperty
 }
 
-export async function createNotification(
+export async function createNotificationForUser(
 	queryData: string,
 	variables: {
 		uuid?: string
@@ -112,7 +112,7 @@ export async function createNotification(
 	}>(
 		getNewApiBaseUrl(),
 		gql`
-			mutation CreateNotification(
+			mutation CreateNotificationForUser(
 				$uuid: String
 				$userId: Int!
 				$appId: Int!
@@ -124,7 +124,7 @@ export async function createNotification(
 				$image: String
 				$href: String
 			) {
-				createNotification(
+				createNotificationForUser(
 					uuid: $uuid
 					userId: $userId
 					appId: $appId

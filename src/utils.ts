@@ -8,7 +8,7 @@ import { DateTime } from "luxon"
 import { listArticles } from "./resolvers/article.js"
 import {
 	listTableObjectsByProperty,
-	createNotification
+	createNotificationForUser
 } from "./services/apiService.js"
 import { ApiError } from "./types.js"
 import { apiErrors } from "./errors.js"
@@ -288,7 +288,7 @@ async function sendNotificationsForArticle(article: Article, feed: Feed) {
 			continue
 		}
 
-		await createNotification(`uuid`, {
+		await createNotificationForUser(`uuid`, {
 			userId: notificationObj.user.id,
 			appId,
 			time: Math.floor(DateTime.now().toSeconds()),
