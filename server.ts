@@ -89,7 +89,7 @@ app.use(
 					userResponse.errors.length > 0 &&
 					userResponse.errors[0].code == 3101
 				) {
-					throwApiError(apiErrors.sessionEnded)
+					throwApiError(apiErrors.sessionExpired)
 				}
 			}
 
