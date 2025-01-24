@@ -34,7 +34,7 @@ export async function createPublisher(
 	}
 
 	// Check if the user is an admin
-	if (!admins.includes(user.id)) {
+	if (!admins.includes(user.Id)) {
 		throwApiError(apiErrors.actionNotAllowed)
 	}
 
@@ -81,7 +81,7 @@ export async function updatePublisher(
 	}
 
 	// Check if the user is an admin
-	if (!admins.includes(user.id)) {
+	if (!admins.includes(user.Id)) {
 		throwApiError(apiErrors.actionNotAllowed)
 	}
 

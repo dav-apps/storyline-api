@@ -10,11 +10,9 @@ import OpenAI from "openai"
 import { createClient } from "redis"
 import { DateTime } from "luxon"
 import { Telegraf } from "telegraf"
-import { Dav, Environment, isSuccessStatusCode } from "dav-js"
-import { getUser } from "./src/services/apiService.js"
+import { Dav, Environment, User, UsersController } from "dav-js"
 import { typeDefs } from "./src/typeDefs.js"
 import { resolvers } from "./src/resolvers.js"
-import { User } from "./src/types.js"
 import { throwApiError, fetchArticles, updateFeedCaches } from "./src/utils.js"
 import { apiErrors } from "./src/errors.js"
 import "dotenv/config"
@@ -80,15 +78,19 @@ app.use(
 			let user: User = null
 
 			if (accessToken != null) {
-				let userResponse = await getUser(accessToken)
+				let userResponse = await UsersController.retrieveUser(
+					`
+						id
+						plan
+					`,
+					{
+						accessToken
+					}
+				)
 
-				if (isSuccessStatusCode(userResponse.status)) {
-					user = userResponse.data
-				} else if (
-					userResponse.errors != null &&
-					userResponse.errors.length > 0 &&
-					userResponse.errors[0].code == 3101
-				) {
+				if (!Array.isArray(userResponse)) {
+					user = userResponse
+				} else if (userResponse.includes("SESSION_EXPIRED")) {
 					throwApiError(apiErrors.sessionExpired)
 				}
 			}

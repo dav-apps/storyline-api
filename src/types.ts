@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client"
 import { RedisClientType } from "redis"
 import OpenAI from "openai"
 import { Telegraf } from "telegraf"
+import { User } from "dav-js"
 
 export interface ResolverContext {
 	prisma: PrismaClient
@@ -29,30 +30,10 @@ export interface ApiError {
 	status?: number
 }
 
-export interface UserApiResponse {
-	status: number
-	data?: User
-	errors?: { code: number; message: string }[]
-}
-
 //#region Platform models
-export interface User {
-	id: number
-	email: string
-	firstName: string
-	confirmed: boolean
-	totalStorage: number
-	usedStorage: number
-	plan: number
-	dev: boolean
-	provider: boolean
-	profileImage: string
-	profileImageEtag: string
-}
-
 export interface TableObject {
 	uuid: string
-	user: User
+	user: any
 	tableId: number
 	properties: { [key: string]: string | number | boolean }
 }

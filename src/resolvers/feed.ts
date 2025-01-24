@@ -22,7 +22,7 @@ export async function createFeed(
 	}
 
 	// Check if the user is an admin
-	if (!admins.includes(user.id)) {
+	if (!admins.includes(user.Id)) {
 		throwApiError(apiErrors.actionNotAllowed)
 	}
 

@@ -1,3 +1,4 @@
+import { Plan } from "dav-js"
 import { ResolverContext, QueryResult } from "../types.js"
 import { defaultCacheExpiration, feedCacheExpiration } from "../constants.js"
 
@@ -30,7 +31,9 @@ export async function cachingResolver(
 ) {
 	if (
 		process.env.CACHING == "false" ||
-		(skipCachingForPlusUsers && context.user != null && context.user.plan > 0)
+		(skipCachingForPlusUsers &&
+			context.user != null &&
+			context.user.Plan != Plan.Free)
 	) {
 		let result: QueryResult<any> = await resolver(parent, args, context)
 		return result.data
@@ -76,7 +79,7 @@ export async function feedCachingResolver(
 
 	if (
 		context.user == null ||
-		context.user.plan == 0 ||
+		context.user.Plan == Plan.Free ||
 		args.excludeFeeds == null
 	) {
 		return await cachingResolver(parent, args, context, info, resolver, true)
