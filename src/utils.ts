@@ -5,9 +5,13 @@ import Parser from "rss-parser"
 import urlMetadata from "url-metadata"
 import * as crypto from "crypto"
 import { DateTime } from "luxon"
-import { Auth, TableObject, TableObjectsController } from "dav-js"
+import {
+	Auth,
+	TableObject,
+	TableObjectsController,
+	NotificationsController
+} from "dav-js"
 import { listArticles } from "./resolvers/article.js"
-import { createNotificationForUser } from "./services/apiService.js"
 import { ApiError } from "./types.js"
 import { apiErrors } from "./errors.js"
 import {
@@ -302,7 +306,12 @@ async function sendNotificationsForArticle(article: Article, feed: Feed) {
 			continue
 		}
 
-		await createNotificationForUser(`uuid`, {
+		await NotificationsController.createNotificationForUser(`uuid`, {
+			auth: new Auth({
+				apiKey: process.env.DAV_API_KEY,
+				secretKey: process.env.DAV_SECRET_KEY,
+				uuid: process.env.DAV_UUID
+			}),
 			userId: notificationObj.User.Id,
 			appId,
 			time: Math.floor(DateTime.now().toSeconds()),
