@@ -5,11 +5,9 @@ import Parser from "rss-parser"
 import urlMetadata from "url-metadata"
 import * as crypto from "crypto"
 import { DateTime } from "luxon"
+import { Auth, TableObject, TableObjectsController } from "dav-js"
 import { listArticles } from "./resolvers/article.js"
-import {
-	listTableObjectsByProperty,
-	createNotificationForUser
-} from "./services/apiService.js"
+import { createNotificationForUser } from "./services/apiService.js"
 import { ApiError } from "./types.js"
 import { apiErrors } from "./errors.js"
 import {
@@ -228,58 +226,74 @@ async function sendNotificationsForArticle(article: Article, feed: Feed) {
 		where: { id: feed.publisherId }
 	})
 
-	// Find all Notification table objects with the publisher of the feed
-	const listNotificationTableObjectsResult = await listTableObjectsByProperty(
-		`
-			total
-			items {
-				uuid
-				user {
-					id
-				}
-			}
-		`,
-		{
-			limit: 1000000,
-			appId,
-			tableName: notificationTableName,
-			propertyName: notificationTablePublisherKey,
-			propertyValue: publisher.uuid
-		}
-	)
+	const auth = new Auth({
+		apiKey: process.env.DAV_API_KEY,
+		secretKey: process.env.DAV_SECRET_KEY,
+		uuid: process.env.DAV_UUID
+	})
 
-	for (let notificationObj of listNotificationTableObjectsResult.items) {
-		// Get the follow table object
-		const listFollowTableObjectsResult = await listTableObjectsByProperty(
+	// Find all Notification table objects with the publisher of the feed
+	const listNotificationTableObjectsResult =
+		await TableObjectsController.listTableObjectsByProperty(
 			`
 				total
 				items {
 					uuid
-					properties
+					user {
+						id
+					}
 				}
 			`,
 			{
-				limit: 1,
+				auth,
+				limit: 1000000,
 				appId,
-				userId: notificationObj.user.id,
-				tableName: followTableName,
-				propertyName: followTablePublisherKey,
+				tableName: notificationTableName,
+				propertyName: notificationTablePublisherKey,
 				propertyValue: publisher.uuid
 			}
 		)
 
+	if (
+		listNotificationTableObjectsResult.length == 0 ||
+		typeof listNotificationTableObjectsResult[0] == "string"
+	) {
+		return
+	}
+
+	for (let notificationObj of listNotificationTableObjectsResult as TableObject[]) {
+		// Get the follow table object
+		const listFollowTableObjectsResult =
+			await TableObjectsController.listTableObjectsByProperty(
+				`
+					total
+					items {
+						uuid
+						properties
+					}
+				`,
+				{
+					auth,
+					limit: 1,
+					appId,
+					userId: notificationObj.User.Id,
+					tableName: followTableName,
+					propertyName: followTablePublisherKey,
+					propertyValue: publisher.uuid
+				}
+			)
+
 		if (
-			listFollowTableObjectsResult == null ||
-			listFollowTableObjectsResult.total == 0
+			listFollowTableObjectsResult.length == 0 ||
+			typeof listFollowTableObjectsResult[0] == "string"
 		) {
 			continue
 		}
 
 		// Check if the user has excluded the feed
-		let properties = listFollowTableObjectsResult.items[0].properties
-		let excludedFeedsProperty = properties[
-			followTableExcludedFeedsKey
-		] as string
+		let properties = listFollowTableObjectsResult[0].Properties
+		let excludedFeedsProperty = properties[followTableExcludedFeedsKey]
+			.value as string
 
 		if (
 			excludedFeedsProperty != null &&
@@ -289,7 +303,7 @@ async function sendNotificationsForArticle(article: Article, feed: Feed) {
 		}
 
 		await createNotificationForUser(`uuid`, {
-			userId: notificationObj.user.id,
+			userId: notificationObj.User.Id,
 			appId,
 			time: Math.floor(DateTime.now().toSeconds()),
 			interval: 0,

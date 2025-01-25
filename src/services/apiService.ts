@@ -1,57 +1,6 @@
 import { request, gql } from "graphql-request"
 import { getNewApiBaseUrl } from "../utils.js"
-import { List, TableObject, Notification } from "../types.js"
-
-export async function listTableObjectsByProperty(
-	queryData: string,
-	variables: {
-		userId?: number
-		appId: number
-		tableName?: string
-		propertyName: string
-		propertyValue: string
-		exact?: boolean
-		limit?: number
-		offset?: number
-	}
-): Promise<List<TableObject>> {
-	let result = await request<{
-		listTableObjectsByProperty: List<TableObject>
-	}>(
-		getNewApiBaseUrl(),
-		gql`
-			query ListTableObjectsByProperty(
-				$userId: Int
-				$appId: Int!
-				$tableName: String
-				$propertyName: String!
-				$propertyValue: String!
-				$exact: Boolean
-				$limit: Int
-				$offset: Int
-			) {
-				listTableObjectsByProperty(
-					userId: $userId
-					appId: $appId
-					tableName: $tableName
-					propertyName: $propertyName
-					propertyValue: $propertyValue
-					exact: $exact
-					limit: $limit
-					offset: $offset
-				) {
-					${queryData}
-				}
-			}
-		`,
-		variables,
-		{
-			Authorization: process.env.DAV_AUTH
-		}
-	)
-
-	return result.listTableObjectsByProperty
-}
+import { Notification } from "../types.js"
 
 export async function createNotificationForUser(
 	queryData: string,
