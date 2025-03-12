@@ -10,7 +10,13 @@ import OpenAI from "openai"
 import { createClient } from "redis"
 import { DateTime } from "luxon"
 import { Telegraf } from "telegraf"
-import { Dav, Environment, User, UsersController } from "dav-js"
+import {
+	Dav,
+	Environment,
+	User,
+	UsersController,
+	convertUserResourceToUser
+} from "dav-js"
 import { typeDefs } from "./src/typeDefs.js"
 import { resolvers } from "./src/resolvers.js"
 import { throwApiError, fetchArticles, updateFeedCaches } from "./src/utils.js"
@@ -89,7 +95,7 @@ app.use(
 				)
 
 				if (!Array.isArray(userResponse)) {
-					user = userResponse
+					user = convertUserResourceToUser(userResponse)
 				} else if (userResponse.includes("SESSION_EXPIRED")) {
 					throwApiError(apiErrors.sessionExpired)
 				}

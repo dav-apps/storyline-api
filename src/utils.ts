@@ -258,14 +258,11 @@ async function sendNotificationsForArticle(article: Article, feed: Feed) {
 			}
 		)
 
-	if (
-		listNotificationTableObjectsResult.length == 0 ||
-		typeof listNotificationTableObjectsResult[0] == "string"
-	) {
+	if (Array.isArray(listNotificationTableObjectsResult)) {
 		return
 	}
 
-	for (let notificationObj of listNotificationTableObjectsResult as TableObject[]) {
+	for (let notificationObj of listNotificationTableObjectsResult.items) {
 		// Get the follow table object
 		const listFollowTableObjectsResult =
 			await TableObjectsController.listTableObjectsByProperty(
@@ -280,17 +277,14 @@ async function sendNotificationsForArticle(article: Article, feed: Feed) {
 					auth,
 					limit: 1,
 					appId,
-					userId: notificationObj.User.Id,
+					userId: notificationObj.user.id,
 					tableName: followTableName,
 					propertyName: followTablePublisherKey,
 					propertyValue: publisher.uuid
 				}
 			)
 
-		if (
-			listFollowTableObjectsResult.length == 0 ||
-			typeof listFollowTableObjectsResult[0] == "string"
-		) {
+		if (Array.isArray(listFollowTableObjectsResult)) {
 			continue
 		}
 
@@ -312,7 +306,7 @@ async function sendNotificationsForArticle(article: Article, feed: Feed) {
 				secretKey: process.env.DAV_SECRET_KEY,
 				uuid: process.env.DAV_UUID
 			}),
-			userId: notificationObj.User.Id,
+			userId: notificationObj.user.id,
 			appId,
 			time: Math.floor(DateTime.now().toSeconds()),
 			interval: 0,
