@@ -9,7 +9,7 @@ export const newApiBaseUrlProduction =
 	"https://dav-api-ax6gp.ondigitalocean.app"
 export const websiteBaseUrlDevelopment = "http://localhost:3004"
 export const websiteBaseUrlStaging =
-	"https://storyline-staging-a6ylk.ondigitalocean.app"
+	"https://storyline-staging-93s9b.ondigitalocean.app"
 export const websiteBaseUrlProduction = "https://storyline.press"
 
 //#region Misc
