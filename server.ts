@@ -21,6 +21,7 @@ import { typeDefs } from "./src/typeDefs.js"
 import { resolvers } from "./src/resolvers.js"
 import { throwApiError, fetchArticles, updateFeedCaches } from "./src/utils.js"
 import { apiErrors } from "./src/errors.js"
+import { setupTasks } from "./src/tasks.js"
 import "dotenv/config"
 
 const port = process.env.PORT || 4004
@@ -73,6 +74,11 @@ new Dav({
 	environment,
 	server: true
 })
+
+if (environment == Environment.Production) {
+	// Setup cron jobs
+	setupTasks()
+}
 
 app.use(
 	"/",
