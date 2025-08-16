@@ -132,6 +132,13 @@ export async function fetchArticles(): Promise<{ newArticlesCount: number }> {
 		}
 
 		for (let feedItem of feed.items) {
+			const pubDate = new Date(feedItem.pubDate)
+
+			// Skip the article if it is older than one day
+			if (new Date().getTime() - pubDate.getTime() > 24 * 60 * 60 * 1000) {
+				continue
+			}
+
 			// Try to find the article in the database
 			const article = await prisma.article.findFirst({
 				where: { url: feedItem.link },
@@ -161,7 +168,7 @@ export async function fetchArticles(): Promise<{ newArticlesCount: number }> {
 							url: feedItem.link,
 							title: feedItem.title,
 							description: feedItem.contentSnippet,
-							date: new Date(feedItem.pubDate),
+							date: pubDate,
 							imageUrl: imageUrl ? imageUrl : null,
 							content: feedItem.content?.trim()
 						}
