@@ -137,30 +137,35 @@ if (
 	}
 
 	while (true) {
-		let before = DateTime.now()
+		try {
+			let before = DateTime.now()
 
-		console.log("---------------")
-		console.log("Starting to fetch articles...")
-		console.log(`Start time: ${before.toString()}`)
+			console.log("---------------")
+			console.log("Starting to fetch articles...")
+			console.log(`Start time: ${before.toString()}`)
 
-		let fetchArticlesResult = await fetchArticles()
+			let fetchArticlesResult = await fetchArticles()
 
-		console.log(`${fetchArticlesResult.newArticlesCount} new articles added`)
-		console.log(
-			`Runtime: ${Math.floor(-before.diffNow("minutes").minutes)} minutes`
-		)
+			console.log(`${fetchArticlesResult.newArticlesCount} new articles added`)
+			console.log(
+				`Runtime: ${Math.floor(-before.diffNow("minutes").minutes)} minutes`
+			)
 
-		before = DateTime.now()
+			before = DateTime.now()
 
-		console.log("\nStarting to update feed caches...")
-		console.log(`Start time: ${before.toString()}`)
+			console.log("\nStarting to update feed caches...")
+			console.log(`Start time: ${before.toString()}`)
 
-		let updateFeedCachesResult = await updateFeedCaches()
+			let updateFeedCachesResult = await updateFeedCaches()
 
-		console.log(`${updateFeedCachesResult.updatedFeedsCount} caches updated`)
-		console.log(
-			`Runtime: ${Math.floor(-before.diffNow("minutes").minutes)} minutes`
-		)
+			console.log(`${updateFeedCachesResult.updatedFeedsCount} caches updated`)
+			console.log(
+				`Runtime: ${Math.floor(-before.diffNow("minutes").minutes)} minutes`
+			)
+		} catch (error) {
+			// Don't crash the server if the database is temporarily unavailable
+			console.error(error)
+		}
 
 		await new Promise(resolve => setTimeout(resolve, interval))
 	}
