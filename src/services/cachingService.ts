@@ -7,7 +7,7 @@ function generateCacheKey(
 	uuid: string,
 	args: object
 ): string {
-	let result = `${resolverName}`
+	let result = resolverName
 
 	if (uuid != null) {
 		result += `:${uuid}`
